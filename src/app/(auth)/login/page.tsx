@@ -11,6 +11,8 @@ import { loginAction } from "@/app/actions/auth-action";
 import { useState, useTransition } from "react";
 // import { signIn } from "@/app/services/auth";
 import { useRouter } from "next/navigation";
+import { FaGoogle } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 export default function Login() {
   const router = useRouter();
@@ -94,9 +96,32 @@ export default function Login() {
         <Button disabled={isPending} type="submit" className="w-full">
           Entrar
         </Button>
-        <Link className="text-[12px] underline" href="/">
+        <div className="grid grid-cols-2 gap-1 mt-1">
+          <Button
+            onClick={async () => {
+              await signIn("google");
+            }}
+            variant="outline"
+            className="flex items-center gap-1"
+          >
+            {" "}
+            <FaGoogle />
+            Google
+          </Button>
+          <Button
+            onClick={async () => {
+              await signIn("github");
+            }}
+            variant="outline"
+            className="flex items-center gap-1"
+          >
+            <FaGithub />
+            Github
+          </Button>
+        </div>
+        {/* <Link className="text-[12px] underline" href="/">
           esqueci a senha
-        </Link>
+        </Link> */}
 
         <div className="mt-8 text-[14px] underline flex justify-between">
           <Link href="/">voltar</Link>

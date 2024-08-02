@@ -3,8 +3,13 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./app/services/database";
 import bcrypt from "bcryptjs";
 
+import Google from "next-auth/providers/google";
+import Github from "next-auth/providers/github";
+
 export default {
   providers: [
+    Google,
+    Github,
     Credentials({
       authorize: async (credentials) => {
         console.log("provider", credentials);

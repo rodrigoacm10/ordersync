@@ -91,7 +91,10 @@ export function CreateOrder() {
                 .filter((e) => e.quantity > 0)
                 .map((e, i) => {
                   return (
-                    <div className="text-[#828282] flex items-center justify-between">
+                    <div
+                      key={i}
+                      className="text-[#828282] flex items-center justify-between"
+                    >
                       <p className="  ">
                         {e.quantity}x {e.product}
                       </p>

@@ -348,6 +348,7 @@ export default function Home() {
             .map((e) => {
               return (
                 <OrderContainer
+                  key={e.id}
                   id={e.id}
                   client={e.client}
                   value={e.value}
@@ -410,6 +411,7 @@ export default function Home() {
                 .map((e) => {
                   return (
                     <OrderContainer
+                      key={e.id}
                       id={e.id}
                       client={e.client}
                       value={e.value}

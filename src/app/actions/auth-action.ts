@@ -55,6 +55,7 @@ export const registerAction = async (values: any) => {
       },
     });
 
+    // await loginAction(values);
     await signIn("credentials", {
       email: values.email,
       password: values.password,
