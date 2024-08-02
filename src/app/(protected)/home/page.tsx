@@ -22,7 +22,6 @@ import { useContext, useEffect, useState } from "react";
 import { TiPlus } from "react-icons/ti";
 import { formatMilliseconds, getTimeFormat } from "../../utils/getTimeFormat";
 import { getOrderInfos } from "../../utils/getOrderInfos";
-import { auth } from "@/app/services/auth";
 import { getSession } from "@/app/actions/auth-action";
 import { signOut } from "next-auth/react";
 
