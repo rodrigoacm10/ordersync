@@ -79,3 +79,12 @@ export const getSession = async () => {
 
   return session;
 };
+
+
+
+export const listUsersController = () => {
+  const users = prisma.user.findMany();
+
+  //   res.send(users);
+  return users;
+};

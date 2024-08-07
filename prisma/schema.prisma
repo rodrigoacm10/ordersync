@@ -59,7 +59,9 @@ model User {
   accounts      Account[]
 //  talvez retirar
   sessions      Session[]
- 
+  products      Product[]
+  orders        Order[]
+
   @@map("users")
 }
  
@@ -74,10 +76,12 @@ model VerificationToken {
 
 model Product {
   id      String  @id @default(cuid())
-  name    String
+  name    String  @unique
   price   Float
-  detail  String?
+  details  String?
   orders  OrderProduct[]
+  userId  String
+  user    User    @relation(fields: [userId], references: [id])
 }
 
 model OrderProduct {
@@ -93,11 +97,14 @@ model OrderProduct {
 
 model Order {
   id              String         @id @default(cuid())
+  concluded       Boolean        @default(false)
   value           Float
   client          String
-  description     String
+  description     String?
   orderItems      OrderProduct[]
   date            String
   timeStart       BigInt
-  timeConcluded   BigInt
+  timeConcluded   BigInt?
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
 }

@@ -6,7 +6,7 @@ import { ConfirmAlert } from "@/components/ConfirmAlert";
 import { CreateOrder } from "@/components/CreateOrder";
 import { CreateProduct } from "@/components/CreateProduct";
 import { DivisorConcluded } from "@/components/DivisorConcluded";
-import { OrderContainer, OrderProps } from "@/components/OrderContainer";
+import { OrderContainer } from "@/components/OrderContainer";
 import { Title } from "@/components/Title";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,23 @@ import { formatMilliseconds, getTimeFormat } from "../../utils/getTimeFormat";
 import { getOrderInfos } from "../../utils/getOrderInfos";
 import { getSession } from "@/app/actions/auth-action";
 import { signOut } from "next-auth/react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { ListProductController } from "@/app/actions/product-actions";
+import { getUserController } from "@/app/actions/user-actions";
+import {
+  concludedOrderController,
+  deleteOrderController,
+  listOrderController,
+} from "@/app/actions/order-actions";
+import { string } from "yup";
 
 const data = [
   {
@@ -98,6 +115,29 @@ const data = [
 type FilterType = "separate" | "mixed" | "pending" | "accomplished";
 type OrderType = "arrival" | "recent";
 
+interface OrderItemProps {
+  id: string;
+  quantity: number;
+  productId: string;
+  productName: string;
+  orderId: string;
+  value: number;
+}
+
+interface OrderProps {
+  client: string;
+  concluded: boolean;
+  date: string;
+  description: string | null;
+  orderItems: OrderItemProps[];
+
+  id: string;
+  value: number;
+  timeStart: bigint | number;
+  timeConcluded: bigint | number | null;
+  userId: string;
+}
+
 export default function Home() {
   // console.log(new Date().getTime());
 
@@ -141,32 +181,24 @@ export default function Home() {
   // const session = await auth();
 
   const [session, setSession] = useState({});
-
-  useEffect(() => {
-    // getSession();
-    const fetchData = async () => {
-      try {
-        // const session = await auth();
-        // const response = await fetch('/api/some-endpoint');
-        // const result = await response.json();
-        // setData(result);
-        const session = await getSession();
-        console.log(session);
-
-        // console.log(session);
-        // if (!session) return;
-        // setSession(session);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  });
-
   const [orderType, setOrderType] = useState<OrderType>("arrival");
   const [filterType, setFilterType] = useState<FilterType>("separate");
   const [showData, setShowData] = useState(false);
+  const [totalArrState, setTotalArrState] = useState([]);
+  const [pendingArrState, setPendingArrState] = useState([]);
+  const [accomplishedArrState, setAccomplishedArrState] = useState([]);
+  const [ordersArr, setOrdersArr] = useState<OrderProps[]>([]);
+  const [dateCur, setDateCur] = useState(
+    getTimeFormat(new Date().getTime(), "date")?.split(" ")[0]
+  );
+
+  // const { totalArr, pendingArr, accomplishedArr } = getOrderInfos(data);
+
+  const [date, setDate] = useState<Date | undefined>(
+    new Date()
+    // to: addDays(new Date(2022, 0, 20), 20),
+  );
+  // const []
 
   const {
     cancelVisible,
@@ -180,17 +212,109 @@ export default function Home() {
     setAddProduct,
     createProductVisible,
     setCreateProductVisible,
+    userIdContext,
+    setUserIdContext,
+    attData,
+    setAttData,
   } = useContext(SetContext);
 
-  const { totalArr, pendingArr, accomplishedArr } = getOrderInfos(data);
-
-  const toConcludedOrder = () => {
-    // escrever a função para marcar como cncluido e att a lista
-    console.log(idConcluded);
+  const attFetch = async () => {
+    if (userIdContext) {
+      const orders = await listOrderController({
+        id: userIdContext,
+        date: dateCur as string,
+      });
+      console.log(orders);
+      if (orders) {
+        const ordersWithConvertedBigInt = orders.map((order) => ({
+          ...order,
+          timeStart: Number(order.timeStart), // Convertendo BigInt para number
+          timeConcluded: order.timeConcluded ? Number(order.timeConcluded) : 0, // Convertendo BigInt para number
+        }));
+        setOrdersArr([...(ordersWithConvertedBigInt as [])]);
+        const { totalArr, pendingArr, accomplishedArr } = getOrderInfos(orders);
+        console.log("3 arr", totalArr, pendingArr, accomplishedArr);
+        if (totalArr && pendingArr && accomplishedArr) {
+          setTotalArrState(totalArr as []);
+          setPendingArrState(pendingArr as []);
+          setAccomplishedArrState(accomplishedArr as []);
+        }
+      }
+    }
   };
 
-  const toDeleteOrder = () => {
+  const fetchData = async () => {
+    try {
+      // const session = await auth();
+      // const response = await fetch('/api/some-endpoint');
+      // const result = await response.json();
+      // setData(result);
+
+      const session = await getSession();
+      if (session?.user?.email) {
+        const userInfos = await getUserController({
+          email: session.user.email,
+        });
+        if (userInfos) {
+          setUserIdContext(userInfos?.id);
+          const orders = await listOrderController({
+            id: userInfos?.id,
+            date: dateCur as string,
+          });
+          console.log(orders);
+          if (orders) {
+            const ordersWithConvertedBigInt = orders.map((order) => ({
+              ...order,
+              timeStart: Number(order.timeStart), // Convertendo BigInt para number
+              timeConcluded: order.timeConcluded
+                ? Number(order.timeConcluded)
+                : 0, // Convertendo BigInt para number
+            }));
+            setOrdersArr([...(ordersWithConvertedBigInt as [])]);
+            const { totalArr, pendingArr, accomplishedArr } =
+              getOrderInfos(orders);
+            console.log("3 arr", totalArr, pendingArr, accomplishedArr);
+            if (totalArr && pendingArr && accomplishedArr) {
+              setTotalArrState(totalArr as []);
+              setPendingArrState(pendingArr as []);
+              setAccomplishedArrState(accomplishedArr as []);
+            }
+          }
+        }
+        console.log(userInfos);
+      }
+
+      console.log(session);
+      return;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    attFetch();
+  }, [attData]);
+
+  const toConcludedOrder = async () => {
+    console.log(date);
+    const concludedOrder = await concludedOrderController({ id: idConcluded });
+    console.log(concludedOrder);
+    // escrever a função para marcar como cncluido e att a lista
     console.log(idConcluded);
+    setAttData(attData + 1);
+    setConcludedConfirm(!concludedConfirm);
+  };
+
+  const toDeleteOrder = async () => {
+    console.log(idConcluded);
+    await deleteOrderController({ id: idConcluded });
+
+    setAttData(attData + 1);
+    setCancelVisible(!cancelVisible);
   };
 
   return (
@@ -232,10 +356,58 @@ export default function Home() {
           </Button>
         </div>
 
+        <div className=" pt-[20px]">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[10s0px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? (
+                  <span>
+                    {getTimeFormat(date.getTime(), "date")?.split(",")[0]}
+                  </span>
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onMonthChange={() => {
+                  console.log(date);
+                }}
+                onSelect={(e) => {
+                  setDate(e);
+                  if (e) {
+                    setDateCur(
+                      getTimeFormat(e.getTime(), "date")
+                        ?.split(" ")[0]
+                        .split(",")[0]
+                    );
+                    console.log(
+                      getTimeFormat(e.getTime(), "date")
+                        ?.split(" ")[0]
+                        .split(",")[0]
+                    );
+                    setAttData(attData + 1);
+                  }
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
         <div
           className={`${
             showData ? "hidden small:block" : ""
-          } pt-[20px] gap-2 flex justify-between`}
+          } pt-[5px] gap-2 flex justify-between`}
         >
           <div className="flex items-center gap-1">
             <Select onValueChange={(e) => setOrderType(e as OrderType)}>
@@ -325,121 +497,74 @@ export default function Home() {
             showData ? "hidden small:block" : ""
           }  flex-1  custombar overflow-y-scroll gap-3 flex flex-col mt-[10px]`}
         >
-          {data
-            .sort((a, b) => {
-              if (orderType == "arrival") {
-                return a.timeStart - b.timeStart;
-              } else if (orderType == "recent") {
-                return b.timeStart - a.timeStart;
-              } else {
-                return 0;
-              }
-            })
-            .filter((e) => {
-              if (filterType == "separate" || filterType == "pending") {
-                return e.concluded == false;
-              } else if (filterType == "mixed") {
-                return e;
-              } else if (filterType == "accomplished") {
-                return e.concluded == true;
-              }
-            })
-            .map((e) => {
-              return (
-                <OrderContainer
-                  key={e.id}
-                  id={e.id}
-                  client={e.client}
-                  value={e.value}
-                  description={e.description}
-                  order={e.order}
-                  timeStart={e.timeStart}
-                  concluded={e.concluded}
-                  timeConcluded={e.timeConcluded}
-                />
-              );
-            })}
+          {
+            // data
+            ordersArr
+              .sort((a, b) => {
+                a.timeStart = Number(a.timeStart);
+                b.timeStart = Number(b.timeStart);
 
-          {/* <OrderContainer
-            id="asd"
-            client="fulaninho"
-            value={28}
-            description="lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho"
-            order={[
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-            ]}
-            timeStart="16:23"
-            concluded={false}
-          />
-          <OrderContainer
-            id="asd2"
-            client="fulaninho"
-            value={28}
-            description="lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho"
-            order={[
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-            ]}
-            concluded={false}
-            timeStart="16:23"
-          />
-          <OrderContainer
-            id="asd3"
-            client="fulaninho"
-            value={28}
-            description="lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho"
-            order={[
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-            ]}
-            concluded={false}
-            timeStart="16:23"
-          /> */}
+                if (orderType == "arrival") {
+                  return a.timeStart - b.timeStart;
+                } else if (orderType == "recent") {
+                  return b.timeStart - a.timeStart;
+                } else {
+                  return 0;
+                }
+              })
+              .filter((e) => {
+                if (filterType == "separate" || filterType == "pending") {
+                  return e.concluded == false;
+                } else if (filterType == "mixed") {
+                  return e;
+                } else if (filterType == "accomplished") {
+                  return e.concluded == true;
+                }
+              })
+              .map((e) => {
+                return (
+                  <OrderContainer
+                    key={e.id}
+                    id={e.id}
+                    client={e.client}
+                    value={e.value}
+                    description={e.description}
+                    orderItems={e.orderItems}
+                    timeStart={e.timeStart}
+                    concluded={e.concluded}
+                    timeConcluded={e.timeConcluded}
+                  />
+                );
+              })
+          }
+
           {filterType == "separate" ? (
             <>
               <DivisorConcluded />
-              {data
-                .filter((e) => e.concluded == true)
-                .map((e) => {
-                  return (
-                    <OrderContainer
-                      key={e.id}
-                      id={e.id}
-                      client={e.client}
-                      value={e.value}
-                      description={e.description}
-                      order={e.order}
-                      timeStart={e.timeStart}
-                      timeConcluded={e.timeConcluded}
-                      concluded={e.concluded}
-                    />
-                  );
-                })}
+              {
+                // data
+                ordersArr
+                  .filter((e) => e.concluded == true)
+                  .map((e) => {
+                    return (
+                      <OrderContainer
+                        key={e.id}
+                        id={e.id}
+                        client={e.client}
+                        value={e.value}
+                        description={e.description}
+                        orderItems={e.orderItems}
+                        timeStart={e.timeStart}
+                        timeConcluded={e.timeConcluded}
+                        concluded={e.concluded}
+                      />
+                    );
+                  })
+              }
             </>
           ) : (
             ""
           )}
-          {/* <OrderContainer
-            id="asd4"
-            client="fulaninho"
-            value={28}
-            description=""
-            order={[
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-              { quantity: 200, product: "ssla" },
-            ]}
-            concluded={true}
-            timeStart="16:23"
-          /> */}
         </div>
       </div>
       <div
@@ -452,43 +577,17 @@ export default function Home() {
         </h2>
 
         <div className="flex-1  custombar-clean overflow-y-scroll gap-3 flex flex-col mt-[10px] pr-[10px]">
-          <AllOrdersInfos
-            title="pendentes"
-            ordersProduct={
-              pendingArr
-              //   [
-              //   { quantity: 16, product: "pastel de carne" },
-              //   { quantity: 2, product: "kitkat" },
-              // ]
-            }
-          />
+          <AllOrdersInfos title="pendentes" ordersProduct={pendingArrState} />
 
           <AllOrdersInfos
             title="realizados"
-            ordersProduct={
-              accomplishedArr
-              // [{ quantity: 2, product: "pastel de carne" }]
-            }
+            ordersProduct={accomplishedArrState}
           />
 
           <AllOrdersInfos
             title="total"
             ordersProduct={
-              // totalArr
-              [
-                { quantity: 100, product: "pastel de carne azul" },
-                { quantity: 2, product: "kitkat" },
-                { quantity: 100, product: "pastel de carne" },
-                { quantity: 2, product: "kitkat" },
-                { quantity: 100, product: "pastel de carne" },
-                { quantity: 2, product: "kitkat" },
-                { quantity: 100, product: "pastel de carne" },
-                { quantity: 2, product: "kitkat" },
-                { quantity: 100, product: "pastel de carne" },
-                { quantity: 2, product: "kitkat" },
-                { quantity: 100, product: "pastel de carne" },
-                { quantity: 2, product: "kitkat" },
-              ]
+              totalArrState // totalArrState
             }
           />
         </div>
@@ -502,7 +601,13 @@ export default function Home() {
             vendido
           </h3>
           <span className="text-black">
-            R$ {totalArr.reduce((acc, e) => (acc += e.value), 0)},00
+            {/* R$ {totalArr.reduce((acc, e) => (acc += e.value), 0)},00 */}
+            R${" "}
+            {totalArrState.reduce(
+              (acc, e: OrderItemProps) => (acc += e.value),
+              0
+            )}
+            ,00
           </span>
         </div>
 

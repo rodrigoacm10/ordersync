@@ -1,13 +1,37 @@
-import { OrderContainerProps, OrderProps } from "@/components/OrderContainer";
+// import { OrderContainerProps, OrderProps } from "@/components/OrderContainer";
 
-export const getOrderInfos = (data: OrderContainerProps[]) => {
-  const totalArr: OrderProps[] = [];
+interface OrderItemProps {
+  id: string;
+  quantity: number;
+  productId: string;
+  productName: string;
+  orderId: string;
+  value: number;
+}
+
+interface OrderProps {
+  client: string;
+  concluded: boolean;
+  date: string;
+  description: string | null;
+  orderItems: OrderItemProps[];
+
+  id: string;
+  value: number;
+  timeStart: bigint;
+  timeConcluded: bigint | null;
+  userId: string;
+}
+
+export const getOrderInfos = (data: OrderProps[]) => {
+  console.log(data);
+  const totalArr: OrderItemProps[] = [];
 
   // const getInfosArr =
   data.map((e) => {
-    e.order.map((e) => {
-      const objEl = totalArr.find((el) => el.product == e.product);
-      const indexEl = totalArr.findIndex((el) => el.product == e.product);
+    e.orderItems.map((e) => {
+      const objEl = totalArr.find((el) => el.productId == e.productId);
+      const indexEl = totalArr.findIndex((el) => el.productId == e.productId);
 
       if (!!objEl) {
         // console.log(totalArr[indexEl].value);
@@ -25,14 +49,16 @@ export const getOrderInfos = (data: OrderContainerProps[]) => {
     });
   });
 
-  const pendingArr: OrderProps[] = [];
+  const pendingArr: OrderItemProps[] = [];
 
   data
     .filter((e) => e.concluded == false)
     .map((e) => {
-      e.order.map((e) => {
-        const objEl = pendingArr.find((el) => el.product == e.product);
-        const indexEl = pendingArr.findIndex((el) => el.product == e.product);
+      e.orderItems.map((e) => {
+        const objEl = pendingArr.find((el) => el.productId == e.productId);
+        const indexEl = pendingArr.findIndex(
+          (el) => el.productId == e.productId
+        );
 
         if (!!objEl) {
           // console.log(pendingArr[indexEl].value);
@@ -50,15 +76,15 @@ export const getOrderInfos = (data: OrderContainerProps[]) => {
       });
     });
 
-  const accomplishedArr: OrderProps[] = [];
+  const accomplishedArr: OrderItemProps[] = [];
 
   data
     .filter((e) => e.concluded == true)
     .map((e) => {
-      e.order.map((e) => {
-        const objEl = accomplishedArr.find((el) => el.product == e.product);
+      e.orderItems.map((e) => {
+        const objEl = accomplishedArr.find((el) => el.productId == e.productId);
         const indexEl = accomplishedArr.findIndex(
-          (el) => el.product == e.product
+          (el) => el.productId == e.productId
         );
 
         if (!!objEl) {

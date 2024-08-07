@@ -7,16 +7,17 @@ import { SetContext } from "@/contexts/setContext";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { createProductController } from "@/app/actions/product-actions";
 
 export function CreateProduct() {
-  const { createProductVisible, setCreateProductVisible } =
+  const { userIdContext, createProductVisible, setCreateProductVisible } =
     useContext(SetContext);
 
   const checkoutCreateProductSchema = yupResolver(
     yup.object({
       name: yup.string().required("inserir campo"),
       price: yup.string().required("inserir campo"),
-      details: yup.string().required("inserir campo"),
+      details: yup.string(),
     })
   );
 
@@ -39,9 +40,16 @@ export function CreateProduct() {
   } = formMethods;
 
   // colocar os tipos
-  const handleCreateProductSubmit = (values: any) => {
+  const handleCreateProductSubmit = async (values: any) => {
     console.log("funcionou");
     console.log(values);
+    const newProduct = await createProductController({
+      name: values.name,
+      price: +values.price,
+      details: values.details,
+      userId: userIdContext,
+    });
+    console.log(newProduct);
   };
 
   return (

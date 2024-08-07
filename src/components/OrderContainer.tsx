@@ -6,7 +6,7 @@ import { useContext, useState } from "react";
 import { SetContext } from "@/contexts/setContext";
 import { formatMilliseconds, getTimeFormat } from "@/app/utils/getTimeFormat";
 
-export interface OrderProps {
+export interface OrderTestProps {
   quantity: number;
   product: string;
   value: number;
@@ -16,7 +16,7 @@ export interface OrderContainerProps {
   value: number;
   client: string;
   description: string;
-  order: OrderProps[];
+  order: OrderTestProps[];
   concluded: boolean;
   timeStart: number;
   timeConcluded: number;
@@ -24,16 +24,75 @@ export interface OrderContainerProps {
   id: string;
 }
 
+interface OrderItemProps {
+  id: string;
+  quantity: number;
+  productId: string;
+  productName: string;
+  orderId: string;
+  value: number;
+}
+
+interface OrderProps {
+  client: string;
+  concluded: boolean;
+  date: string;
+  description: string | null;
+  orderItems: OrderItemProps[];
+
+  id: string;
+  value: number;
+  timeStart: bigint | number;
+  timeConcluded: bigint | number | null;
+  userId: string;
+}
+
+// colocar os novos tipos para funcionar
+
+// interface OrderItemProps {
+//   id: string;
+//   quantity: number;
+//   productId: string;
+//   productName: string;
+//   orderId: string;
+//   value: number;
+// }
+
+// interface OrderProps {
+//   client: string;
+//   concluded: boolean;
+//   date: string;
+//   description: string | null;
+//   orderItems: OrderItemProps[];
+
+//   id: string;
+//   value: number;
+//   timeStart: bigint;
+//   timeConcluded: bigint | null;
+//   userId: string;
+// }
+
 export function OrderContainer({
   client,
   description,
-  order,
+  orderItems,
   value,
   concluded,
   timeStart,
   timeConcluded,
   id,
-}: OrderContainerProps) {
+}: Omit<OrderProps, "date" | "userId">) {
+  // const order = orderItems.map((order) => ({
+  //   ...order,
+  //   timeStart: Number(order.timeStart), // Convertendo BigInt para number
+  // timeConcluded: order.timeConcluded
+  //   ? Number(order.timeConcluded)
+  //   : 0, // Convertendo BigInt para number
+  // }));
+
+  timeStart = Number(timeStart);
+  timeConcluded = timeConcluded ? Number(timeConcluded) : 0;
+
   const [openOptions, setOpenOptions] = useState(false);
   // const [timeWaiting, setTimeWaiting] = useState(
   //   new Date().getTime() - timeStart
@@ -74,17 +133,21 @@ export function OrderContainer({
     setIdConcluded,
   } = useContext(SetContext);
 
-  console.log(timeConcluded);
+  // console.log(timeConcluded);
 
   // if (!timeConcluded) {
   //   timeConcluded = 0;
   // }
 
   console.log(
-    timeConcluded,
-    getTimeFormat(timeStart, "all"),
-    getTimeFormat(timeConcluded, "all")
+    timeStart
+
+    // getTimeFormat(timeConcluded, "all")
   );
+
+  console.log("all->", getTimeFormat(timeStart, "all"));
+  console.log("date->", getTimeFormat(timeStart, "date"));
+  console.log("hours->", getTimeFormat(timeStart, "hours"));
 
   return (
     <div
@@ -95,7 +158,8 @@ export function OrderContainer({
       <div className="flex items-center justify-between">
         <div className="text-[16px]  medium:text-[20px]  font-semibold flex items-center gap-2">
           <h3 className="flex-shrink-0">
-            R$ {order.reduce((acc, e) => (acc += e.value), 0)},00
+            {value}
+            R$ {orderItems.reduce((acc, e) => (acc += e.value), 0)},00
           </h3>
           <span>-</span>
           <h3>{client}</h3>
@@ -126,10 +190,11 @@ export function OrderContainer({
       </div>
 
       <div className="text-[16px]  medium:text-[18px]  text-[#828282] mt-[20px]    max-w-[1000px]   w-full  ">
-        {order.map((e, i) => {
+        {orderItems.map((e, i) => {
           return (
             <span key={i} className={`${i > 0 ? "pl-1" : ""}  `}>
-              {e.quantity}x {e.product} {i < order.length - 1 ? "-" : ""}
+              {e.quantity}x {e.productName}{" "}
+              {i < orderItems.length - 1 ? "-" : ""}
             </span>
           );
         })}

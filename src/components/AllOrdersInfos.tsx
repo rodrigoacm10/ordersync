@@ -1,6 +1,6 @@
 interface OrderProps {
   quantity: number;
-  product: string;
+  productName: string;
 }
 
 interface AllOrdersInfosProps {
@@ -9,6 +9,8 @@ interface AllOrdersInfosProps {
 }
 
 export function AllOrdersInfos({ title, ordersProduct }: AllOrdersInfosProps) {
+  // console.log(title, "array", ordersProduct);
+
   return (
     <div className="mt-[20px]">
       <div className="flex items-center font-bold text-[17px]  medium:text-[20px] justify-between">
@@ -19,7 +21,7 @@ export function AllOrdersInfos({ title, ordersProduct }: AllOrdersInfosProps) {
         {ordersProduct.map((e, i) => {
           return (
             <li key={i}>
-              {e.quantity}x {e.product}
+              {e.quantity}x {e.productName}
             </li>
           );
         })}

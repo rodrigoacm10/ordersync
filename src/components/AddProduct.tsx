@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   Select,
@@ -13,12 +13,40 @@ import { SetContext } from "@/contexts/setContext";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { ListProductController } from "@/app/actions/product-actions";
 
 export function AddProduct() {
+  interface Product {
+    id: string;
+    name: string;
+    price: number;
+    details?: string;
+    userId: string;
+  }
   const [quantity, setQuantity] = useState(1);
+  const [productList, setProductList] = useState<Product[]>([]);
+  const [curProduct, setCurProduct] = useState<Product>();
+  const [allPrice, setAllPrice] = useState(0);
 
-  const { addProduct, setAddProduct, addProductList, setAddProductList } =
-    useContext(SetContext);
+  const {
+    userIdContext,
+    addProduct,
+    setAddProduct,
+    addProductList,
+    setAddProductList,
+  } = useContext(SetContext);
+
+  const getInfos = async () => {
+    const products = await ListProductController({ id: userIdContext });
+    console.log(products);
+    if (products) {
+      setProductList([...(products as Product[])]);
+    }
+  };
+
+  useEffect(() => {
+    getInfos();
+  }, []);
 
   const checkoutAddProductSchema = yupResolver(
     yup.object({
@@ -46,17 +74,20 @@ export function AddProduct() {
 
   // colocar os tipos
   const handleAddProductSubmit = (values: any) => {
-    console.log("funcionou");
+    console.log(values);
+
+    // console.log("funcionou");
     setAddProductList([
       ...addProductList,
       {
-        quantity: 10,
-        product: "sla",
-        value: 100,
+        quantity: quantity,
+        productId: values.product,
+        productName: curProduct?.name as string,
+        // product: "sla",
+        value: allPrice,
       },
     ]);
     console.log(quantity);
-    console.log(values);
   };
 
   return (
@@ -72,10 +103,14 @@ export function AddProduct() {
         <div className="flex items-center gap-2 mt-2">
           <Select
             onValueChange={(e) => {
-              // console.log(e);
+              console.log(e);
+              const prod = productList.find((el) => el.id == e);
+
+              setCurProduct(prod);
+              setAllPrice(prod?.price as number);
               setValue("product", e);
             }}
-            // {...register("product")}
+            {...register("product")}
           >
             <SelectTrigger className="w-[120px]">
               <SelectValue
@@ -85,12 +120,27 @@ export function AddProduct() {
             </SelectTrigger>
             <SelectContent className=" ">
               <SelectGroup className=" ">
-                <SelectItem className=" " value="chegada">
+                {productList.map((e) => {
+                  return (
+                    <SelectItem
+                      onClick={() => {
+                        // console.log(e.name);
+                        console.log("aaaaaaaa");
+                      }}
+                      key={e.id}
+                      className=" "
+                      value={`${e.id}`}
+                    >
+                      {e.name}
+                    </SelectItem>
+                  );
+                })}
+                {/* <SelectItem className=" " value="chegada">
                   nome de produto muito ggrande
                 </SelectItem>
                 <SelectItem className=" " value="recente">
                   recente
-                </SelectItem>
+                </SelectItem> */}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -101,8 +151,11 @@ export function AddProduct() {
                 e.preventDefault();
                 if (quantity > 1) {
                   setQuantity(quantity - 1);
+                  console.log(curProduct?.price);
+                  setAllPrice((curProduct?.price as number) * (quantity - 1));
                 } else {
-                  return;
+                  setQuantity(1);
+                  // return;
                 }
               }}
               variant="outline"
@@ -120,6 +173,9 @@ export function AddProduct() {
               onClick={(e) => {
                 e.preventDefault();
                 setQuantity(quantity + 1);
+                console.log(curProduct?.price);
+
+                setAllPrice((curProduct?.price as number) * (quantity + 1));
               }}
               variant="outline"
             >
@@ -127,7 +183,9 @@ export function AddProduct() {
             </Button>
           </div>
 
-          <span className="font-bold">R$ 1000,00</span>
+          <span className="font-bold">
+            {curProduct ? `R$ ${allPrice}` : ""}{" "}
+          </span>
         </div>
         <div className="  mt-4  flex gap-1 justify-end ">
           <Button
@@ -142,6 +200,9 @@ export function AddProduct() {
 
           <Button
             type="submit"
+            // onClick={(e) => {
+            //   e.preventDefault();
+            // }}
             // onClick={() => {
             //   setAddProduct(!addProduct);
             //   // setAddProductList([

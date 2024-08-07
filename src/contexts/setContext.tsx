@@ -8,7 +8,9 @@ interface setContextProps {
 
 interface AddProductListProps {
   quantity: number;
-  product: string;
+  productId: string;
+  productName: string;
+  // product: "sla",
   value: number;
 }
 
@@ -23,10 +25,14 @@ export const SetContext = createContext({
   setCreateVisible: (val: boolean) => {},
   addProduct: false,
   setAddProduct: (val: boolean) => {},
-  addProductList: [{ quantity: 0, product: "", value: 0 }],
+  addProductList: [{ quantity: 0, productId: "", productName: "", value: 0 }],
   setAddProductList: (val: AddProductListProps[]) => {},
   createProductVisible: false,
   setCreateProductVisible: (val: boolean) => {},
+  userIdContext: "",
+  setUserIdContext: (val: string) => {},
+  attData: 0,
+  setAttData: (val: number) => {},
 });
 
 export function SetContextProvider({ children }: setContextProps) {
@@ -38,11 +44,14 @@ export function SetContextProvider({ children }: setContextProps) {
   const [addProductList, setAddProductList] = useState([
     {
       quantity: 0,
-      product: "",
+      productId: "",
+      productName: "",
       value: 0,
     },
   ]);
   const [createProductVisible, setCreateProductVisible] = useState(false);
+  const [userIdContext, setUserIdContext] = useState("");
+  const [attData, setAttData] = useState(0);
 
   return (
     <SetContext.Provider
@@ -61,6 +70,10 @@ export function SetContextProvider({ children }: setContextProps) {
         setAddProductList,
         createProductVisible,
         setCreateProductVisible,
+        userIdContext,
+        setUserIdContext,
+        attData,
+        setAttData,
       }}
     >
       {children}

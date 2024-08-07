@@ -7,6 +7,8 @@ import { SetContext } from "@/contexts/setContext";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { createOrderController } from "@/app/actions/order-actions";
+import { getTimeFormat } from "@/app/utils/getTimeFormat";
 
 export function CreateOrder() {
   const {
@@ -16,6 +18,7 @@ export function CreateOrder() {
     setAddProduct,
     addProductList,
     setAddProductList,
+    userIdContext,
   } = useContext(SetContext);
 
   const checkoutCreateOrderSchema = yupResolver(
@@ -44,7 +47,7 @@ export function CreateOrder() {
   } = formMethods;
 
   // colocar os tipos
-  const handleCreateOrderSubmit = (values: any) => {
+  const handleCreateOrderSubmit = async (values: any) => {
     let arrProds = [...addProductList];
     arrProds.shift();
     console.log("funcionou");
@@ -52,6 +55,58 @@ export function CreateOrder() {
     // console.log(addProductList);
     console.log(arrProds);
     console.log(values);
+
+    // data: {
+    //   value: value, // Total value of the order
+    //   client: client,
+    //   description: description,
+    //   //   date: "2024-08-01",
+    //   date: date,
+    //   timeStart: timeStart,
+    //   timeConcluded: timeConcluded, // 1 hour later
+    //   userId: userId,
+    //   orderItems: {
+    //     create: [...orderItems],
+    //   },
+    // },
+
+    // console.log("enviado", {
+    //   client: values.client,
+    //   description: values.details,
+    //   value: addProductList.reduce(
+    //     (acc, e) => (acc = acc + e.value),
+    //     0
+    //   ) as number,
+    //   date: getTimeFormat(new Date().getTime(), "date")?.split(
+    //     ","
+    //   )[0] as string,
+    //   timeStart: new Date().getTime(),
+    //   timeConcluded: new Date().getTime(),
+    //   userId: userIdContext,
+    //   orderItems: arrProds,
+    // });
+
+    const order = await createOrderController({
+      client: values.client,
+      description: values.details,
+      value: addProductList.reduce(
+        (acc, e) => (acc = acc + e.value),
+        0
+      ) as number,
+      date: getTimeFormat(new Date().getTime(), "date")?.split(
+        ","
+      )[0] as string,
+      timeStart: new Date().getTime(),
+      timeConcluded: new Date().getTime(),
+      userId: userIdContext,
+      orderItems: arrProds,
+    });
+
+    console.log(order);
+    setAddProductList([
+      { quantity: 0, productId: "", productName: "", value: 0 },
+    ]);
+    arrProds = [{ quantity: 0, productId: "", productName: "", value: 0 }];
   };
 
   return (
@@ -96,7 +151,7 @@ export function CreateOrder() {
                       className="text-[#828282] flex items-center justify-between"
                     >
                       <p className="  ">
-                        {e.quantity}x {e.product}
+                        {e.quantity}x {e.productName}
                       </p>
 
                       <span className="flex items-center justify-end   w-[170px] font-bold text-black">
