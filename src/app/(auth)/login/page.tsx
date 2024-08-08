@@ -78,7 +78,7 @@ export default function Login() {
           <Input
             {...register("email")}
             type="email"
-            placeholder="Ex: R$ 10,00"
+            placeholder="exemplo@gmail.com"
           />
         </div>
 
@@ -87,7 +87,7 @@ export default function Login() {
           <Input
             {...register("password")}
             type="password"
-            placeholder="Ex: R$ 10,00"
+            placeholder="insira sua senha"
           />
         </div>
 

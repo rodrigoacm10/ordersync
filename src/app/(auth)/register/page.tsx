@@ -45,7 +45,7 @@ export default function Register() {
           <Input
             {...register("name")}
             type="string"
-            placeholder="Ex: R$ 10,00"
+            placeholder="nome do usuário"
           />
         </div>
 
@@ -54,7 +54,7 @@ export default function Register() {
           <Input
             {...register("email")}
             type="email"
-            placeholder="Ex: R$ 10,00"
+            placeholder="exemplo@gmail.com"
           />
         </div>
 
@@ -63,7 +63,7 @@ export default function Register() {
           <Input
             {...register("password")}
             type="password"
-            placeholder="Ex: R$ 10,00"
+            placeholder="crie sua senha"
           />
         </div>
 
@@ -72,7 +72,7 @@ export default function Register() {
           <Input
             {...register("passwordConfim")}
             type="password"
-            placeholder="Ex: R$ 10,00"
+            placeholder="confirme sua senha"
           />
         </div>
 

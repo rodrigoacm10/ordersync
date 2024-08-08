@@ -158,8 +158,8 @@ export function OrderContainer({
       <div className="flex items-center justify-between">
         <div className="text-[16px]  medium:text-[20px]  font-semibold flex items-center gap-2">
           <h3 className="flex-shrink-0">
-            {value}
-            R$ {orderItems.reduce((acc, e) => (acc += e.value), 0)},00
+            R$ {value},00
+            {/* R$ {orderItems.reduce((acc, e) => (acc += e.value), 0)},00 */}
           </h3>
           <span>-</span>
           <h3>{client}</h3>

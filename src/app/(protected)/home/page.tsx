@@ -638,7 +638,7 @@ export default function Home() {
           visible={concludedConfirm}
           cancel={setConcludedConfirm}
           toDo={toConcludedOrder}
-          title="Deseja excluir"
+          title="Deseja confirmar"
           subtitle="o pedido?"
         />
       ) : (
