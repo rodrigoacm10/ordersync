@@ -98,7 +98,8 @@ export default function Login() {
         </Button>
         <div className="grid grid-cols-2 gap-1 mt-1">
           <Button
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               await signIn("google");
             }}
             variant="outline"
@@ -109,7 +110,8 @@ export default function Login() {
             Google
           </Button>
           <Button
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
               await signIn("github");
             }}
             variant="outline"

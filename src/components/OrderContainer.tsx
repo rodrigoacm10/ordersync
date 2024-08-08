@@ -139,15 +139,14 @@ export function OrderContainer({
   //   timeConcluded = 0;
   // }
 
-  console.log(
-    timeStart
+  console.log(concluded);
+  console.log("sta", timeStart);
+  console.log("con", timeConcluded);
+  console.log(timeConcluded - timeStart);
 
-    // getTimeFormat(timeConcluded, "all")
-  );
-
-  console.log("all->", getTimeFormat(timeStart, "all"));
-  console.log("date->", getTimeFormat(timeStart, "date"));
-  console.log("hours->", getTimeFormat(timeStart, "hours"));
+  // console.log("all->", getTimeFormat(timeStart, "all"));
+  // console.log("date->", getTimeFormat(timeStart, "date"));
+  // console.log("hours->", getTimeFormat(timeStart, "hours"));
 
   return (
     <div
@@ -205,14 +204,18 @@ export function OrderContainer({
 
       <div className="  absolute right-8 bottom-2 self-end flex items-center gap-3">
         <p className="flex text-[14px] gap-1 text-[#828282]">
-          feito: <span>{getTimeFormat(timeStart, "hours")}</span>
+          pedido: <span>{getTimeFormat(timeStart, "hours")}</span>
         </p>
         <p className="flex text-[14px] gap-1 text-[#828282]">
-          espera:{" "}
+          {/* espera:{" "}
           <span>
             {concluded
               ? formatMilliseconds(timeConcluded - timeStart)
               : formatMilliseconds(1000)}
+          </span> */}
+          feito:{" "}
+          <span>
+            {concluded ? getTimeFormat(timeConcluded, "hours") : " espera"}
           </span>
         </p>
       </div>

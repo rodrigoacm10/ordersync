@@ -189,7 +189,7 @@ export default function Home() {
   const [accomplishedArrState, setAccomplishedArrState] = useState([]);
   const [ordersArr, setOrdersArr] = useState<OrderProps[]>([]);
   const [dateCur, setDateCur] = useState(
-    getTimeFormat(new Date().getTime(), "date")?.split(" ")[0]
+    getTimeFormat(new Date().getTime(), "date")?.split(" ")[0].split(",")[0]
   );
 
   // const { totalArr, pendingArr, accomplishedArr } = getOrderInfos(data);
@@ -219,6 +219,7 @@ export default function Home() {
   } = useContext(SetContext);
 
   const attFetch = async () => {
+    console.log("dateCur", dateCur);
     if (userIdContext) {
       const orders = await listOrderController({
         id: userIdContext,
@@ -245,6 +246,8 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
+      console.log("dateCur", dateCur);
+
       // const session = await auth();
       // const response = await fetch('/api/some-endpoint');
       // const result = await response.json();

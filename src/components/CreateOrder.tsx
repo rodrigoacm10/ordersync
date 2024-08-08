@@ -19,12 +19,14 @@ export function CreateOrder() {
     addProductList,
     setAddProductList,
     userIdContext,
+    attData,
+    setAttData,
   } = useContext(SetContext);
 
   const checkoutCreateOrderSchema = yupResolver(
     yup.object({
       client: yup.string().required("inserir campo"),
-      details: yup.string().required("inserir campo"),
+      details: yup.string(),
     })
   );
 
@@ -38,6 +40,7 @@ export function CreateOrder() {
   });
 
   const {
+    reset,
     register,
     handleSubmit,
     watch,
@@ -101,12 +104,15 @@ export function CreateOrder() {
       userId: userIdContext,
       orderItems: arrProds,
     });
+    setAttData(attData + 1);
 
     console.log(order);
     setAddProductList([
       { quantity: 0, productId: "", productName: "", value: 0 },
     ]);
     arrProds = [{ quantity: 0, productId: "", productName: "", value: 0 }];
+    setCreateVisible(!createVisible);
+    reset();
   };
 
   return (
@@ -196,7 +202,9 @@ export function CreateOrder() {
             <Button
               onClick={(e) => {
                 e.preventDefault();
-                setAddProductList([]);
+                setAddProductList([
+                  { quantity: 0, productId: "", productName: "", value: 0 },
+                ]);
 
                 setCreateVisible(!createVisible);
               }}

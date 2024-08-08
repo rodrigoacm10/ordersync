@@ -107,7 +107,7 @@ export const createOrderController = async ({
 export const concludedOrderController = async ({ id }: { id: string }) => {
   const updatedOrder = await prisma.order.update({
     where: { id },
-    data: { concluded: true },
+    data: { concluded: true, timeConcluded: new Date().getTime() },
   });
   return updatedOrder;
 };

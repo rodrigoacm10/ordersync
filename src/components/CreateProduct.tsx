@@ -31,6 +31,7 @@ export function CreateProduct() {
   });
 
   const {
+    reset,
     register,
     handleSubmit,
     watch,
@@ -50,6 +51,8 @@ export function CreateProduct() {
       userId: userIdContext,
     });
     console.log(newProduct);
+    setCreateProductVisible(!createProductVisible);
+    reset();
   };
 
   return (
