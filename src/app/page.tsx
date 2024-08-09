@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { RiFileList2Line } from "react-icons/ri";
 
@@ -85,29 +86,29 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Streamline Your Order Management with OrderSync
+                    Simplifique o gerenciamento de seus pedidos com OrderSync
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    OrderSync is a powerful order management application that
-                    helps you track orders, manage inventory, and generate
-                    insightful reports.
+                    OrderSync é um poderoso aplicativo de gerenciamento de
+                    pedidos que ajuda você a rastrear pedidos, gerenciar estoque
+                    e gerar relatórios perspicazes.
                   </p>
                 </div>
                 <div className="flex   gap-2 min-[400px]:flex-row">
                   <Link
-                    href="#"
+                    href="/register"
                     className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                     prefetch={false}
                   >
-                    Try OrderSync
+                    Testar OrderSync
                   </Link>
-                  <Link
-                    href="#"
+                  <a
+                    href="#content"
                     className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
+                    // prefetch={false}
                   >
-                    Learn More
-                  </Link>
+                    Ler mais
+                  </a>
                 </div>
               </div>
               {/* <img
@@ -120,19 +121,23 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className=" w-full py-12 md:py-24 lg:py-32 bg-muted">
+        <section
+          id="content"
+          className=" w-full py-12 md:py-24 lg:py-32 bg-muted"
+        >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                  Key Features
+                  Principais recursos
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Streamline Your Order Management
+                  Simplifique o gerenciamento de seus pedidos
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  OrderSync provides a comprehensive set of tools to help you
-                  manage your orders, inventory, and reporting with ease.
+                  OrderSync fornece um conjunto abrangente de ferramentas para
+                  ajudá-lo gerencie seus pedidos, estoque e relatórios com
+                  facilidade.
                 </p>
               </div>
             </div>
@@ -141,32 +146,37 @@ export default function Home() {
                 <ul className="grid gap-6">
                   <li>
                     <div className="grid gap-1">
-                      <h3 className="text-xl font-bold">Order Tracking</h3>
+                      <h3 className="text-xl font-bold">
+                        Acompanhamento de pedidos
+                      </h3>
                       <p className="text-muted-foreground">
-                        Track the status of your orders in real-time and receive
-                        notifications on order updates.
+                        Acompanhe o status dos seus pedidos em tempo real e
+                        receba notificações sobre atualizações de pedidos.
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">
-                        Inventory Management
+                        Gerenciamento de Estoque
                       </h3>
                       <p className="text-muted-foreground">
-                        Manage your inventory levels, receive low stock alerts,
-                        and generate reports on stock movements.
+                        Gerencie seus níveis de estoque, receba alertas de
+                        estoque baixo, e gerar relatórios sobre movimentos de
+                        estoque.
                       </p>
                     </div>
                   </li>
                   <li>
                     <div className="grid gap-1">
                       <h3 className="text-xl font-bold">
-                        Reporting and Analytics
+                        Ordenação Inteligente de Pedidos
                       </h3>
                       <p className="text-muted-foreground">
-                        Generate detailed reports on your orders, sales, and
-                        inventory to gain valuable insights into your business.
+                        Classifique e organize seus pedidos automaticamente com
+                        base em critérios personalizados, como urgência, tipo de
+                        produto ou cliente. Mantenha suas operações sempre
+                        eficientes e bem organizadas.
                       </p>
                     </div>
                   </li>
@@ -186,35 +196,72 @@ export default function Home() {
           <div className="container grid items-center gap-6 px-4 md:px-6 lg:grid-cols-2 lg:gap-10">
             <div className="space-y-2">
               <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                Benefits
+                Benefícios
               </div>
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                Streamline Your Order Management with OrderSync
+                Simplifique o gerenciamento de seus pedidos com OrderSync
               </h2>
               <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                OrderSync helps you save time, reduce errors, and make informed
-                decisions with its powerful order management features.
+                OrderSync ajuda você a economizar tempo, reduzir erros e tomar
+                decisões informadas com seus poderosos recursos de gerenciamento
+                de pedidos.
               </p>
             </div>
             <div className="flex   gap-2 min-[400px]:flex-row lg:justify-end">
               <Link
-                href="#"
+                href="/login"
                 className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                 prefetch={false}
               >
-                Sign Up
+                Entrar
               </Link>
               <Link
                 href="/register"
                 className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                 prefetch={false}
               >
-                Try OrderSync
+                Experimentar OrderSync
               </Link>
             </div>
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32 border-t">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+                Comece com o OrderSync
+              </h2>
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Inscreva-se para um teste gratuito e experimente o poder do
+                OrderSync para o seu negócio.
+              </p>
+            </div>
+            <div className="mx-auto w-full max-w-sm space-y-2">
+              <form className="flex justify-center gap-2">
+                {/* <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="max-w-lg flex-1"
+                /> */}
+                <Link href="/register">
+                  <Button type="submit">Começar</Button>
+                </Link>
+              </form>
+              <p className="text-xs text-muted-foreground">
+                Utilize permanentemente{" "}
+                <span className="underline underline-offset-2">sem custos</span>
+                {/* <Link
+                  href="#"
+                  className="underline underline-offset-2"
+                  prefetch={false}
+                >
+                  Terms &amp; Conditions
+                </Link> */}
+              </p>
+            </div>
+          </div>
+        </section>
+        {/* <section className="w-full py-12 md:py-24 lg:py-32 border-t">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -302,7 +349,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">
