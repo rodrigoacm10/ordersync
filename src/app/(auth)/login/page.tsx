@@ -80,6 +80,14 @@ export default function Login() {
             type="email"
             placeholder="exemplo@gmail.com"
           />
+          {error ? (
+            <span className="text-[12px] text-[red]">
+              {" "}
+              *Email ou senha inválidos
+            </span>
+          ) : (
+            ""
+          )}
         </div>
 
         <div>
@@ -89,12 +97,20 @@ export default function Login() {
             type="password"
             placeholder="insira sua senha"
           />
+          {error ? (
+            <span className="text-[12px] text-[red]">
+              {" "}
+              *Email ou senha inválidos
+            </span>
+          ) : (
+            ""
+          )}
         </div>
 
         <div className="h-[1px] w-full bg-[#DCDCDC] mt-2 mb-2"></div>
 
         <Button disabled={isPending} type="submit" className="w-full">
-          Entrar
+          {isPending ? <span className="loader"></span> : "Entrar"}
         </Button>
         <div className="grid grid-cols-2 gap-1 mt-1">
           <Button

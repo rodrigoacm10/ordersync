@@ -3,18 +3,42 @@
 import { registerAction } from "@/app/actions/auth-action";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import * as yup from "yup";
 
 export default function Register() {
+  const router = useRouter();
+
+  const checkoutLoginSchema = yupResolver(
+    yup.object({
+      name: yup.string().required("inserir campo"),
+      email: yup.string().required("inserir campo"),
+      password: yup
+        .string()
+        .min(8, "A senha deve ter no mínimo 8 caracteres")
+        .required("inserir campo"),
+      passwordConfim: yup
+        .string()
+        .oneOf([yup.ref("password")], "As senhas devem ser iguais")
+        .required("inserir campo"),
+    })
+  );
+
   const formMethods = useForm({
     // defaultValues: {
     //   costValue: "0",
     //   profitMargin: "0",
     //   saleValue: "0",
     // },
-    // resolver: checkoutLoginSchema,
+    resolver: checkoutLoginSchema,
   });
+
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const {
     register,
@@ -28,6 +52,17 @@ export default function Register() {
   const handleRegister = async (values: any) => {
     const register = await registerAction(values);
     console.log(register);
+
+    setError(null);
+    startTransition(async () => {
+      const response = await registerAction(values);
+      console.log(response); // setTab
+      if (response.error) {
+        setError(response.error);
+      } else {
+        router.push("/home");
+      }
+    });
   };
 
   return (
@@ -55,7 +90,15 @@ export default function Register() {
             {...register("email")}
             type="email"
             placeholder="exemplo@gmail.com"
-          />
+          />{" "}
+          {error && error == "user already exists" ? (
+            <span className="text-[12px] text-[red]">
+              {" "}
+              *Email já cadastrado
+            </span>
+          ) : (
+            ""
+          )}
         </div>
 
         <div>
@@ -65,6 +108,14 @@ export default function Register() {
             type="password"
             placeholder="crie sua senha"
           />
+          {errors.password ? (
+            <span className="text-[12px] text-[red]">
+              {" "}
+              *A senha deve ter pelo menos 8 caracters
+            </span>
+          ) : (
+            ""
+          )}
         </div>
 
         <div>
@@ -74,6 +125,14 @@ export default function Register() {
             type="password"
             placeholder="confirme sua senha"
           />
+          {errors.passwordConfim ? (
+            <span className="text-[12px] text-[red]">
+              {" "}
+              *As senhas devem ser iguais
+            </span>
+          ) : (
+            ""
+          )}
         </div>
 
         <div className="h-[1px] w-full bg-[#DCDCDC] mt-2 mb-2"></div>
