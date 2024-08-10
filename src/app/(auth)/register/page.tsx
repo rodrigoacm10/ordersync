@@ -137,8 +137,8 @@ export default function Register() {
 
         <div className="h-[1px] w-full bg-[#DCDCDC] mt-2 mb-2"></div>
 
-        <Button type="submit" className="w-full">
-          Criar
+        <Button disabled={isPending} type="submit" className="w-full">
+          {isPending ? <span className="loader"></span> : "Criar"}
         </Button>
 
         <div className="mt-8 text-[14px] underline flex justify-between">
