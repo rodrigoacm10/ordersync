@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useTransition } from "react";
 import { Title } from "./Title";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -8,8 +8,12 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createProductController } from "@/app/actions/product-actions";
+import { useToast } from "./ui/use-toast";
 
 export function CreateProduct() {
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+
   const { userIdContext, createProductVisible, setCreateProductVisible } =
     useContext(SetContext);
 
@@ -42,17 +46,23 @@ export function CreateProduct() {
 
   // colocar os tipos
   const handleCreateProductSubmit = async (values: any) => {
-    console.log("funcionou");
-    console.log(values);
-    const newProduct = await createProductController({
-      name: values.name,
-      price: +values.price,
-      details: values.details,
-      userId: userIdContext,
+    startTransition(async () => {
+      console.log("funcionou");
+      console.log(values);
+      const newProduct = await createProductController({
+        name: values.name,
+        price: +values.price,
+        details: values.details,
+        userId: userIdContext,
+      });
+      console.log(newProduct);
+      setCreateProductVisible(!createProductVisible);
+      reset();
+      toast({
+        variant: "confirmed",
+        title: "Produto criado ",
+      });
     });
-    console.log(newProduct);
-    setCreateProductVisible(!createProductVisible);
-    reset();
   };
 
   return (
@@ -108,12 +118,8 @@ export function CreateProduct() {
               Cancelar
             </Button>
 
-            <Button
-              onClick={() => {
-                console.log("foi");
-              }}
-            >
-              Criar
+            <Button disabled={isPending} type="submit">
+              {isPending ? <span className="loader"></span> : "Criar"}
             </Button>
           </div>
         </form>

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useTransition } from "react";
 import { Title } from "./Title";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -9,8 +9,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createOrderController } from "@/app/actions/order-actions";
 import { getTimeFormat } from "@/app/utils/getTimeFormat";
+import { useToast } from "./ui/use-toast";
 
 export function CreateOrder() {
+  const { toast } = useToast();
+
+  // const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   const {
     createVisible,
     setCreateVisible,
@@ -51,68 +57,44 @@ export function CreateOrder() {
 
   // colocar os tipos
   const handleCreateOrderSubmit = async (values: any) => {
-    let arrProds = [...addProductList];
-    arrProds.shift();
-    console.log("funcionou");
-    // console.log(addProductList.slice(0, 1));
-    // console.log(addProductList);
-    console.log(arrProds);
-    console.log(values);
+    startTransition(async () => {
+      let arrProds = [...addProductList];
+      arrProds.shift();
+      console.log("funcionou");
+      // console.log(addProductList.slice(0, 1));
+      // console.log(addProductList);
+      console.log(arrProds);
+      console.log(values);
 
-    // data: {
-    //   value: value, // Total value of the order
-    //   client: client,
-    //   description: description,
-    //   //   date: "2024-08-01",
-    //   date: date,
-    //   timeStart: timeStart,
-    //   timeConcluded: timeConcluded, // 1 hour later
-    //   userId: userId,
-    //   orderItems: {
-    //     create: [...orderItems],
-    //   },
-    // },
+      const order = await createOrderController({
+        client: values.client,
+        description: values.details,
+        value: addProductList.reduce(
+          (acc, e) => (acc = acc + e.value),
+          0
+        ) as number,
+        date: getTimeFormat(new Date().getTime(), "date")?.split(
+          ","
+        )[0] as string,
+        timeStart: new Date().getTime(),
+        timeConcluded: new Date().getTime(),
+        userId: userIdContext,
+        orderItems: arrProds,
+      });
+      setAttData(attData + 1);
 
-    // console.log("enviado", {
-    //   client: values.client,
-    //   description: values.details,
-    //   value: addProductList.reduce(
-    //     (acc, e) => (acc = acc + e.value),
-    //     0
-    //   ) as number,
-    //   date: getTimeFormat(new Date().getTime(), "date")?.split(
-    //     ","
-    //   )[0] as string,
-    //   timeStart: new Date().getTime(),
-    //   timeConcluded: new Date().getTime(),
-    //   userId: userIdContext,
-    //   orderItems: arrProds,
-    // });
-
-    const order = await createOrderController({
-      client: values.client,
-      description: values.details,
-      value: addProductList.reduce(
-        (acc, e) => (acc = acc + e.value),
-        0
-      ) as number,
-      date: getTimeFormat(new Date().getTime(), "date")?.split(
-        ","
-      )[0] as string,
-      timeStart: new Date().getTime(),
-      timeConcluded: new Date().getTime(),
-      userId: userIdContext,
-      orderItems: arrProds,
+      console.log(order);
+      setAddProductList([
+        { quantity: 0, productId: "", productName: "", value: 0 },
+      ]);
+      arrProds = [{ quantity: 0, productId: "", productName: "", value: 0 }];
+      setCreateVisible(!createVisible);
+      reset();
+      toast({
+        variant: "confirmed",
+        title: "Pedido criado ",
+      });
     });
-    setAttData(attData + 1);
-
-    console.log(order);
-    setAddProductList([
-      { quantity: 0, productId: "", productName: "", value: 0 },
-    ]);
-    arrProds = [{ quantity: 0, productId: "", productName: "", value: 0 }];
-    setCreateVisible(!createVisible);
-    reset();
   };
 
   return (
@@ -213,7 +195,9 @@ export function CreateOrder() {
               Cancelar
             </Button>
 
-            <Button type="submit">Criar</Button>
+            <Button disabled={isPending} type="submit">
+              {isPending ? <span className="loader"></span> : "Criar"}
+            </Button>
           </div>
         </form>
       </div>

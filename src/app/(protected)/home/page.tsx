@@ -41,76 +41,7 @@ import {
   listOrderController,
 } from "@/app/actions/order-actions";
 import { string } from "yup";
-
-const data = [
-  {
-    id: "asd1",
-    client: "fulaninho",
-    value: 28,
-    description:
-      "lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho",
-    order: [
-      { quantity: 200, product: "ssla", value: 100 },
-      { quantity: 200, product: "ssla2", value: 101 },
-      { quantity: 200, product: "ssla3", value: 102 },
-      { quantity: 200, product: "ssla", value: 103 },
-    ],
-    timeStart: 1722257337246,
-    timeConcluded: 1,
-    concluded: false,
-  },
-
-  {
-    id: "asd2",
-    client: "fulaninho",
-    value: 28,
-    description:
-      "lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho",
-    order: [
-      { quantity: 200, product: "ssla", value: 104 },
-      { quantity: 200, product: "ssla2", value: 105 },
-      { quantity: 200, product: "ssla3", value: 106 },
-      { quantity: 200, product: "ssla", value: 107 },
-    ],
-    timeConcluded: 1,
-    timeStart: 1722257852524,
-    concluded: false,
-  },
-
-  {
-    id: "asd3",
-    client: "fulaninho alberto costa filho",
-    value: 28,
-    description:
-      "lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn ",
-    order: [
-      { quantity: 200, product: "ssla", value: 108 },
-      { quantity: 200, product: "ssla2", value: 109 },
-      { quantity: 200, product: "ssla3", value: 110 },
-      { quantity: 200, product: "ssla", value: 111 },
-    ],
-    timeConcluded: 1,
-    timeStart: 1722258355187,
-    concluded: false,
-  },
-
-  {
-    id: "asd4",
-    client: "fulaninho",
-    value: 28,
-    description:
-      "lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinho lorem asdn asupurtinholorem asdn asupurtinho lorem asdn asupurtinho",
-    order: [
-      { quantity: 200, product: "ssla", value: 112 },
-      { quantity: 200, product: "ssla2", value: 113 },
-      { quantity: 200, product: "ssla3", value: 114 },
-      { quantity: 200, product: "ssla", value: 115 },
-    ],
-    timeStart: 1722258765112,
-    timeConcluded: 1722263782800,
-    concluded: true,
-  },
-];
+import { useToast } from "@/components/ui/use-toast";
 
 type FilterType = "separate" | "mixed" | "pending" | "accomplished";
 type OrderType = "arrival" | "recent";
@@ -179,6 +110,7 @@ export default function Home() {
   // 1722259867745;
 
   // const session = await auth();
+  const { toast } = useToast();
 
   const [session, setSession] = useState({});
   const [orderType, setOrderType] = useState<OrderType>("arrival");
@@ -310,6 +242,10 @@ export default function Home() {
     console.log(idConcluded);
     setAttData(attData + 1);
     setConcludedConfirm(!concludedConfirm);
+    toast({
+      variant: "confirmed",
+      title: "Pedido confirmado ",
+    });
   };
 
   const toDeleteOrder = async () => {
@@ -318,6 +254,10 @@ export default function Home() {
 
     setAttData(attData + 1);
     setCancelVisible(!cancelVisible);
+    toast({
+      variant: "confirmed",
+      title: "Pedido excluído ",
+    });
   };
 
   return (
@@ -482,7 +422,9 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-1 text-[20px]">
             <Button
-              onClick={() => setCreateProductVisible(!createProductVisible)}
+              onClick={() => {
+                setCreateProductVisible(!createProductVisible);
+              }}
               className="text-[14px]  medium:text-[16px]  "
             >
               <TiPlus className="hidden small:block" size={18} /> PRODUTO

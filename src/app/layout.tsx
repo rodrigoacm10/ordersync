@@ -6,7 +6,7 @@ import "./globals.css";
 import { SetContextProvider } from "@/contexts/setContext";
 
 const inter = Inter({ subsets: ["latin"] });
-
+import { Toaster } from "@/components/ui/toaster";
 // const fontSans = FontSans({
 //   subsets: ["latin"],
 //   variable: "--font-sans",
@@ -31,7 +31,10 @@ export default function RootLayout({
         // )}
         className={inter.className}
       >
-        <SetContextProvider>{children}</SetContextProvider>
+        <SetContextProvider>
+          {children}
+          <Toaster />
+        </SetContextProvider>
       </body>
     </html>
   );
