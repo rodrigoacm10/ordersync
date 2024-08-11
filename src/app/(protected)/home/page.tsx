@@ -267,7 +267,7 @@ export default function Home() {
       className="overflow-hidden grid-cols-[1fr] small:grid-cols-[1fr_225px] medium:grid-cols-[1fr_345px]
     
     
-    h-screen px-[24px] medium:px-[52px] py-[25px] small:py-[64px] medium:gap-[46px] gap-[20px] grid   "
+    h-screen px-[18px] medium:px-[52px] py-[20px] small:py-[64px] medium:gap-[46px] gap-[20px] grid   "
     >
       <div className="flex max-h-[450px] h400:max-h-[500px] h500:max-h-[600px] h600:max-h-[650px] h700:max-h-[700px] h875:max-h-[800px]  flex-col">
         {/* {session ? "" : <div>aaaa</div>} */}
@@ -299,7 +299,7 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className=" pt-[20px]">
+        <div className={` ${showData ? "hidden small:block" : ""} pt-[20px]`}>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -354,22 +354,22 @@ export default function Home() {
         >
           <div className="flex items-center gap-1">
             <Select onValueChange={(e) => setOrderType(e as OrderType)}>
-              <SelectTrigger className="w-[95px] small:w-[120px]">
+              <SelectTrigger className="w-[92px] small:w-[120px]">
                 <SelectValue
-                  className="w-[95px] small:w-[120px]"
+                  className="w-[92px] small:w-[120px]"
                   placeholder="chegada"
                 />
               </SelectTrigger>
-              <SelectContent className="w-[95px] small:w-[120px]">
-                <SelectGroup className="w-[95px] small:w-[120px]">
+              <SelectContent className="w-[92px] small:w-[120px]">
+                <SelectGroup className="w-[92px] small:w-[120px]">
                   <SelectItem
-                    className="w-[95px] small:w-[120px]"
+                    className="w-[92px] small:w-[120px]"
                     value="arrival"
                   >
                     chegada
                   </SelectItem>
                   <SelectItem
-                    className="w-[95px] small:w-[120px]"
+                    className="w-[92px] small:w-[120px]"
                     value="recent"
                   >
                     recente
@@ -384,34 +384,34 @@ export default function Home() {
                 setFilterType(e as FilterType);
               }}
             >
-              <SelectTrigger className="w-[95px] small:w-[120px]">
+              <SelectTrigger className="w-[92px] small:w-[120px]">
                 <SelectValue
                   placeholder="separado"
-                  className="w-[95px] small:w-[120px]"
+                  className="w-[92px] small:w-[120px]"
                 />
               </SelectTrigger>
-              <SelectContent className="w-[95px] small:w-[120px]">
-                <SelectGroup className="w-[95px] small:w-[120px]">
+              <SelectContent className="w-[92px] small:w-[120px]">
+                <SelectGroup className="w-[92px] small:w-[120px]">
                   <SelectItem
-                    className="w-[95px] small:w-[120px]"
+                    className="w-[92px] small:w-[120px]"
                     value="separate"
                   >
                     separado
                   </SelectItem>
                   <SelectItem
-                    className="w-[95px] small:w-[120px]"
+                    className="w-[92px] small:w-[120px]"
                     value="mixed"
                   >
                     misto
                   </SelectItem>
                   <SelectItem
-                    className="w-[95px] small:w-[120px]"
+                    className="w-[92px] small:w-[120px]"
                     value="pending"
                   >
                     pendente
                   </SelectItem>
                   <SelectItem
-                    className="w-[95px] small:w-[120px]"
+                    className="w-[92px] small:w-[120px]"
                     value="accomplished"
                   >
                     realizado
@@ -425,13 +425,13 @@ export default function Home() {
               onClick={() => {
                 setCreateProductVisible(!createProductVisible);
               }}
-              className="text-[14px]  medium:text-[16px]  "
+              className="text-[12px]  medium:text-[16px]  "
             >
               <TiPlus className="hidden small:block" size={18} /> PRODUTO
             </Button>
             <Button
               onClick={() => setCreateVisible(!createVisible)}
-              className="text-[14px]  medium:text-[16px]"
+              className="text-[12px]  medium:text-[16px]"
             >
               <TiPlus size={18} className="hidden small:block" /> PEDIDO
             </Button>
