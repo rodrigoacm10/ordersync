@@ -23,6 +23,9 @@ const config = {
     },
     extend: {
       screens: {
+        w430: "430px",
+
+        w500: "500px",
         small: "776px",
 
         medium: "976px",

@@ -76,17 +76,40 @@ export function AddProduct() {
   const handleAddProductSubmit = (values: any) => {
     console.log(values);
 
+    console.log(addProductList.find((e) => e.productId === values.product));
     // console.log("funcionou");
-    setAddProductList([
-      ...addProductList,
-      {
-        quantity: quantity,
-        productId: values.product,
-        productName: curProduct?.name as string,
-        // product: "sla",
-        value: allPrice,
-      },
-    ]);
+    const curProd = addProductList.find((e) => e.productId === values.product);
+    console.log("length", addProductList.length);
+    console.log("condi", curProd || addProductList.length == 1);
+
+    if (!curProd || addProductList.length == 1) {
+      setAddProductList([
+        ...addProductList,
+        {
+          quantity: quantity,
+          productId: values.product,
+          productName: curProduct?.name as string,
+          // product: "sla",
+          value: allPrice,
+        },
+      ]);
+    } else {
+      const prodListCopy = [...addProductList];
+      const attProdList = prodListCopy.map((e) => {
+        if (e.productId === values.product) {
+          const allQuantity = e.quantity + quantity;
+          const prodPrice = e.value / e.quantity;
+          console.log("quantidades", allQuantity, e.quantity, quantity);
+          e.quantity = allQuantity;
+          e.value = prodPrice * allQuantity;
+          return e;
+        } else return e;
+      });
+
+      setAddProductList([...attProdList]);
+      console.log(attProdList);
+    }
+
     console.log(quantity);
   };
 
@@ -107,6 +130,7 @@ export function AddProduct() {
               const prod = productList.find((el) => el.id == e);
 
               setCurProduct(prod);
+              setQuantity(1);
               setAllPrice(prod?.price as number);
               setValue("product", e);
             }}

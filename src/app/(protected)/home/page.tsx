@@ -33,7 +33,11 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ListProductController } from "@/app/actions/product-actions";
+import {
+  EditProductQuantityController,
+  GetProductController,
+  ListProductController,
+} from "@/app/actions/product-actions";
 import { getUserController } from "@/app/actions/user-actions";
 import {
   concludedOrderController,
@@ -42,6 +46,13 @@ import {
 } from "@/app/actions/order-actions";
 import { string } from "yup";
 import { useToast } from "@/components/ui/use-toast";
+import { IoMenuOutline } from "react-icons/io5";
+
+import { useRouter } from "next/navigation";
+import { Sidebar } from "@/components/Sidebar";
+import { CreateClient } from "@/components/CreateClient";
+import { CreateGroup } from "@/components/CreateGroup";
+import { editPrice, listClients } from "@/app/actions/client-actions";
 
 type FilterType = "separate" | "mixed" | "pending" | "accomplished";
 type OrderType = "arrival" | "recent";
@@ -61,12 +72,21 @@ interface OrderProps {
   date: string;
   description: string | null;
   orderItems: OrderItemProps[];
-
+  clientRegis: boolean;
   id: string;
   value: number;
   timeStart: bigint | number;
   timeConcluded: bigint | number | null;
   userId: string;
+}
+
+interface CreateProductProps {
+  name: string;
+  price: number;
+  details: string;
+  userId: string;
+  quantity: number;
+  control: boolean;
 }
 
 export default function Home() {
@@ -111,6 +131,7 @@ export default function Home() {
 
   // const session = await auth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const [session, setSession] = useState({});
   const [orderType, setOrderType] = useState<OrderType>("arrival");
@@ -148,6 +169,15 @@ export default function Home() {
     setUserIdContext,
     attData,
     setAttData,
+    sidebar,
+    setSidebar,
+    createClientVisible,
+    setCreateClientVisible,
+    createGroupVisible,
+    setCreateGroupVisible,
+    isReg,
+    setIsReg,
+    defOrder,
   } = useContext(SetContext);
 
   const attFetch = async () => {
@@ -191,6 +221,7 @@ export default function Home() {
           email: session.user.email,
         });
         if (userInfos) {
+          console.log("userIDD", userInfos?.id);
           setUserIdContext(userInfos?.id);
           const orders = await listOrderController({
             id: userInfos?.id,
@@ -250,14 +281,54 @@ export default function Home() {
 
   const toDeleteOrder = async () => {
     console.log(idConcluded);
-    await deleteOrderController({ id: idConcluded });
+    if (isReg) {
+      console.log("defOrder", defOrder);
+      const clientsArr = await listClients({ id: userIdContext });
+      const curCli = clientsArr.find((e) => e.name === defOrder.client);
 
-    setAttData(attData + 1);
-    setCancelVisible(!cancelVisible);
-    toast({
-      variant: "confirmed",
-      title: "Pedido excluído ",
-    });
+      const editedCli = await editPrice({
+        id: curCli?.id as string,
+        price: defOrder.value + (curCli?.price as number),
+      });
+
+      console.log(editedCli);
+
+      defOrder.orderItems.map(async (e) => {
+        const curProd = (await GetProductController({
+          id: e.productId,
+        })) as CreateProductProps;
+
+        // campo control entraria aki, curProd.control ? curProd.quantity + e.quantity : 0
+        const editProduct = await EditProductQuantityController({
+          id: e.productId,
+          quantity: curProd.control
+            ? e.quantity + (curProd.quantity as number)
+            : 0,
+        });
+
+        console.log(editProduct);
+      });
+
+      // fzr um find em um array de clientes e dps extornar o value da defOrder para o client fznd um editClient e colocando o resultado da soma do price do client com o defOrder, tambem fzr um loop no orderItems e devolver msm esquema
+
+      await deleteOrderController({ id: idConcluded });
+
+      setAttData(attData + 1);
+      setCancelVisible(!cancelVisible);
+      toast({
+        variant: "confirmed",
+        title: "Pedido excluído ",
+      });
+    } else {
+      await deleteOrderController({ id: idConcluded });
+
+      setAttData(attData + 1);
+      setCancelVisible(!cancelVisible);
+      toast({
+        variant: "confirmed",
+        title: "Pedido excluído ",
+      });
+    }
   };
 
   return (
@@ -266,9 +337,11 @@ export default function Home() {
     <main
       className="overflow-hidden grid-cols-[1fr] small:grid-cols-[1fr_225px] medium:grid-cols-[1fr_345px]
     
+      relative
     
     h-screen px-[18px] medium:px-[52px] py-[20px] small:py-[64px] medium:gap-[46px] gap-[20px] grid   "
     >
+      <Sidebar />
       <div className="flex max-h-[450px] h400:max-h-[500px] h500:max-h-[600px] h600:max-h-[650px] h700:max-h-[700px] h875:max-h-[800px]  flex-col">
         {/* {session ? "" : <div>aaaa</div>} */}
         <div>
@@ -284,8 +357,21 @@ export default function Home() {
             sair da conta
           </Button>
         </div>
+        <div className="mb-3 mt-2">
+          <Button
+            variant="ghost"
+            className="p-0"
+            onClick={() => {
+              // console.log("gg");
+              setSidebar(true);
+            }}
+          >
+            <IoMenuOutline size={28} />
+          </Button>
+        </div>
+
         <Title
-          title="Lista de produtos"
+          title="Lista de pedidos"
           subtitle="todos os pedidos realizados ordenadamente"
         />
 
@@ -299,7 +385,11 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className={` ${showData ? "hidden small:block" : ""} pt-[20px]`}>
+        <div
+          className={` ${
+            showData ? "hidden small:block" : ""
+          } pt-[20px] flex items-center justify-between`}
+        >
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -346,11 +436,20 @@ export default function Home() {
               />
             </PopoverContent>
           </Popover>
+          <Button
+            onClick={() => {
+              setCreateClientVisible(!createClientVisible);
+            }}
+            // max-w-[110px]
+            className="text-[12px]  medium:text-[16px]  "
+          >
+            <TiPlus className="hidden small:block" size={18} /> CLIENTE
+          </Button>
         </div>
         <div
           className={`${
             showData ? "hidden small:block" : ""
-          } pt-[5px] gap-2 flex justify-between`}
+          } pt-[5px] gap-[4px] flex justify-between`}
         >
           <div className="flex items-center gap-1">
             <Select onValueChange={(e) => setOrderType(e as OrderType)}>
@@ -421,6 +520,14 @@ export default function Home() {
             </Select>
           </div>
           <div className="flex items-center gap-1 text-[20px]">
+            {/* <Button
+              onClick={() => {
+                setCreateClientVisible(!createClientVisible);
+              }}
+              className="text-[12px]  medium:text-[16px]  "
+            >
+              <TiPlus className="hidden small:block" size={18} /> CLIENTE
+            </Button> */}
             <Button
               onClick={() => {
                 setCreateProductVisible(!createProductVisible);
@@ -478,6 +585,7 @@ export default function Home() {
                     timeStart={e.timeStart}
                     concluded={e.concluded}
                     timeConcluded={e.timeConcluded}
+                    clientRegis={e.clientRegis}
                   />
                 );
               })
@@ -502,6 +610,7 @@ export default function Home() {
                         timeStart={e.timeStart}
                         timeConcluded={e.timeConcluded}
                         concluded={e.concluded}
+                        clientRegis={e.clientRegis}
                       />
                     );
                   })
@@ -594,7 +703,11 @@ export default function Home() {
 
       {addProduct ? <AddProduct /> : ""}
 
-      {createProductVisible ? <CreateProduct /> : ""}
+      {createGroupVisible ? <CreateGroup /> : ""}
+
+      {createProductVisible ? <CreateProduct edit={false} /> : ""}
+
+      {createClientVisible ? <CreateClient edit={false} /> : ""}
     </main>
   );
 }

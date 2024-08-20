@@ -9,6 +9,7 @@ interface ConfirmAlertProps {
   cancel: (visible: boolean) => void;
   toDo: () => void;
   type: "cancel" | "concluded";
+  sub?: string;
 }
 
 export function ConfirmAlert({
@@ -18,6 +19,7 @@ export function ConfirmAlert({
   toDo,
   visible,
   type,
+  sub,
 }: ConfirmAlertProps) {
   return (
     <div
@@ -27,6 +29,14 @@ export function ConfirmAlert({
       <div className="z-50 fixed pt-4 px-1 pb-2 rounded-[5px] opacity-100 bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-[220px] ">
         <h2 className="font-bold text-center text-[20px] ">{title}</h2>
         <h2 className="font-bold text-center text-[20px]">{subtitle}</h2>
+        {sub ? (
+          <p className="text-[#828282] mt-2 text-center text-[10px] small:text-[12px] ">
+            {sub}
+          </p>
+        ) : (
+          ""
+        )}
+
         <div className="w-full flex gap-1 mt-8">
           <Button
             onClick={() => cancel(!visible)}

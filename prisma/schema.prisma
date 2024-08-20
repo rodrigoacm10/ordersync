@@ -60,7 +60,9 @@ model User {
 //  talvez retirar
   sessions      Session[]
   products      Product[]
+  clients       Client[]
   orders        Order[]
+  groups        Group[]
 
   @@map("users")
 }
@@ -74,14 +76,40 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-model Product {
-  id      String  @id @default(cuid())
-  name    String  @unique
-  price   Float
-  details  String?
-  orders  OrderProduct[]
+  // userId  String
+  // user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+model Group {
+  id      String   @id @default(cuid())
+  name    String   @unique
   userId  String
-  user    User    @relation(fields: [userId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  clients Client[] // Relacionamento com Client
+}
+
+model Client {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  price     Float
+  group     String?  @map("group_name")
+  details   String?
+  orders    Order[] // Relacionamento com Order
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  groupId   String?
+  groupRel  Group?  @relation(fields: [groupId], references: [id], onDelete: SetNull)
+}
+
+model Product {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  price     Float
+  control   Boolean @default(false)
+  quantity  Int     @default(0)
+  details   String?
+  orders    OrderProduct[]
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
 }
 
 model OrderProduct {
@@ -100,6 +128,9 @@ model Order {
   concluded       Boolean        @default(false)
   value           Float
   client          String
+  clientRegis     Boolean        @default(false)
+  clientId        String?        // Campo clientId opcional
+  clientRelation  Client?        @relation(fields: [clientId], references: [id])
   description     String?
   orderItems      OrderProduct[]
   date            String

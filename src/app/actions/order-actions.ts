@@ -20,6 +20,7 @@ interface CreateOrderProps {
   timeConcluded: number;
   userId: string;
   orderItems: OrderItemsProps[];
+  clientRegis: boolean;
 }
 
 export const listOrderController = async ({
@@ -51,6 +52,7 @@ export const createOrderController = async ({
   timeConcluded,
   userId,
   orderItems,
+  clientRegis,
 }: CreateOrderProps) => {
   const order = await prisma.order.create({
     data: {
@@ -62,6 +64,7 @@ export const createOrderController = async ({
       timeStart: timeStart,
       timeConcluded: timeConcluded, // 1 hour later
       userId: userId,
+      clientRegis: clientRegis,
       orderItems: {
         create: [...orderItems],
       },

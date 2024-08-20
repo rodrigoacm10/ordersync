@@ -39,7 +39,7 @@ interface OrderProps {
   date: string;
   description: string | null;
   orderItems: OrderItemProps[];
-
+  clientRegis: boolean;
   id: string;
   value: number;
   timeStart: bigint | number;
@@ -81,6 +81,7 @@ export function OrderContainer({
   timeStart,
   timeConcluded,
   id,
+  clientRegis,
 }: Omit<OrderProps, "date" | "userId">) {
   // const order = orderItems.map((order) => ({
   //   ...order,
@@ -131,6 +132,10 @@ export function OrderContainer({
     concludedConfirm,
     setConcludedConfirm,
     setIdConcluded,
+    isReg,
+    setIsReg,
+    defOrder,
+    setDefOrder,
   } = useContext(SetContext);
 
   // console.log(timeConcluded);
@@ -139,10 +144,10 @@ export function OrderContainer({
   //   timeConcluded = 0;
   // }
 
-  console.log(concluded);
-  console.log("sta", timeStart);
-  console.log("con", timeConcluded);
-  console.log(timeConcluded - timeStart);
+  // console.log(concluded);
+  // console.log("sta", timeStart);
+  // console.log("con", timeConcluded);
+  // console.log(timeConcluded - timeStart);
 
   // console.log("all->", getTimeFormat(timeStart, "all"));
   // console.log("date->", getTimeFormat(timeStart, "date"));
@@ -178,6 +183,20 @@ export function OrderContainer({
           <button
             disabled={concluded}
             onClick={() => {
+              // coloar o useState bolean aqui
+              // cliRegistred
+              setDefOrder({
+                client: client,
+                description: description,
+                orderItems: orderItems,
+                value: value,
+                concluded: concluded,
+                timeStart: timeStart,
+                timeConcluded: timeConcluded,
+                id: id,
+                clientRegis: clientRegis,
+              });
+              setIsReg(clientRegis);
               setIdConcluded(id);
               setOpenOptions(!openOptions);
             }}
@@ -234,7 +253,7 @@ export function OrderContainer({
           >
             excluir
           </button>
-          <button className="p-2 px-4">editar</button>
+          {/* <button className="p-2 px-4">editar</button> */}
         </div>
       ) : (
         ""

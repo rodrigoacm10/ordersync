@@ -58,20 +58,6 @@
     --chart-5: 340 75% 55%;
   }
 }
-.custombar::-webkit-scrollbar {
-  width: 8px; /* Largura da scrollbar */
-}
-
-.custombar::-webkit-scrollbar-track {
-  background: #dbdbdb; /* Cor do fundo da scrollbar */
-  border-radius: 10px; /* Arredondamento da barra */
-}
-
-.custombar::-webkit-scrollbar-thumb {
-  background-color: #828282; /* Cor da barra */
-  border-radius: 10px; /* Arredondamento da barra */
-  /* border: 3px solid #f1f1f1; Espaçamento entre a barra e a track */
-}
 
 .custombar-clean::-webkit-scrollbar {
   width: 4px; /* Largura da scrollbar */
@@ -86,6 +72,48 @@
   background-color: #828282; /* Cor da barra */
   border-radius: 10px; /* Arredondamento da barra */
   /* border: 3px solid #f1f1f1; Espaçamento entre a barra e a track */
+}
+
+.scrollbarx {
+  overflow-x: auto;
+  /* white-space: nowrap; Para conteúdo inline sem quebra */
+}
+
+.scrollbarx::-webkit-scrollbar {
+  height: 6px !important;
+  /* Altura da barra horizontal */
+  width: 6px !important; /* Largura da scrollbar */
+}
+
+.scrollbarx::-webkit-scrollbar-thumb {
+  background-color: #828282 !important; /* Cor da barra */
+  border-radius: 10px !important; /* Arredondamento da barra */
+}
+
+.scrollbarx::-webkit-scrollbar-track {
+  background: #dbdbdb !important; /* Cor do fundo da scrollbar */
+  border-radius: 10px !important; /* Arredondamento da barra */
+}
+
+/* Para navegadores Firefox */
+/* .scrollbarx {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+} */
+
+.custombar::-webkit-scrollbar {
+  /* height: 4px; */
+  width: 8px; /* Largura da scrollbar */
+}
+
+.custombar::-webkit-scrollbar-track {
+  background: #dbdbdb; /* Cor do fundo da scrollbar */
+  border-radius: 10px; /* Arredondamento da barra */
+}
+
+.custombar::-webkit-scrollbar-thumb {
+  background-color: #828282; /* Cor da barra */
+  border-radius: 10px; /* Arredondamento da barra */
 }
 
 .loader {
