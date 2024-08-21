@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useContext, useState } from "react";
 import { SetContext } from "@/contexts/setContext";
 import { formatMilliseconds, getTimeFormat } from "@/app/utils/getTimeFormat";
+import { priceMask } from "@/app/utils/masks";
 
 export interface OrderTestProps {
   quantity: number;
@@ -162,7 +163,8 @@ export function OrderContainer({
       <div className="flex items-center justify-between">
         <div className="text-[16px]  medium:text-[20px]  font-semibold flex items-center gap-2">
           <h3 className="flex-shrink-0">
-            R$ {value},00
+            {priceMask(`${value.toFixed(2)}`)}
+            {/* R$ {value},00 */}
             {/* R$ {orderItems.reduce((acc, e) => (acc += e.value), 0)},00 */}
           </h3>
           <span>-</span>

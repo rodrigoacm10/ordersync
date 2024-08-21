@@ -53,6 +53,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { CreateClient } from "@/components/CreateClient";
 import { CreateGroup } from "@/components/CreateGroup";
 import { editPrice, listClients } from "@/app/actions/client-actions";
+import { priceMask } from "@/app/utils/masks";
 
 type FilterType = "separate" | "mixed" | "pending" | "accomplished";
 type OrderType = "arrival" | "recent";
@@ -656,12 +657,11 @@ export default function Home() {
           </h3>
           <span className="text-black">
             {/* R$ {totalArr.reduce((acc, e) => (acc += e.value), 0)},00 */}
-            R${" "}
-            {totalArrState.reduce(
-              (acc, e: OrderItemProps) => (acc += e.value),
-              0
+            {priceMask(
+              `${totalArrState
+                .reduce((acc, e: OrderItemProps) => (acc += e.value), 0)
+                .toFixed(2)}`
             )}
-            ,00
           </span>
         </div>
 

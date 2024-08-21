@@ -1,4 +1,4 @@
-import { useContext, useState, useTransition } from "react";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { Title } from "./Title";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -13,6 +13,7 @@ import {
 } from "@/app/actions/product-actions";
 import { useToast } from "./ui/use-toast";
 import { Checkbox } from "./ui/checkbox";
+import { onlyNumbers, priceMask, priceValueMask } from "@/app/utils/masks";
 
 export function CreateProduct({
   edit,
@@ -53,17 +54,35 @@ export function CreateProduct({
     })
   );
 
+  const checkoutCreateControlProductSchema = yupResolver(
+    yup.object({
+      name: yup.string().required("inserir campo"),
+      price: yup.string().required("inserir campo"),
+      details: yup.string(),
+      quantity: yup.string().required("inserir campo"),
+    })
+  );
+
+  const changeSchema = () => {
+    if (check) {
+      return checkoutCreateControlProductSchema;
+    } else {
+      return checkoutCreateProductSchema;
+    }
+  };
+
   const formMethods = useForm({
     defaultValues: {
       name: name ? name : "",
-      price: price ? `${price}` : "",
+      price: price ? priceMask(`${price.toFixed(2)}`) : "0",
       quantity: quantity ? `${quantity}` : "0",
       details: details ? details : "",
       //   costValue: "0",
       //   profitMargin: "0",
       //   saleValue: "0",
     },
-    resolver: checkoutCreateProductSchema,
+    // resolver: checkoutCreateProductSchema,
+    resolver: changeSchema() as any,
   });
 
   const {
@@ -76,16 +95,31 @@ export function CreateProduct({
     formState: { errors },
   } = formMethods;
 
+  const quantityValue = watch("quantity");
+  const priceValue = watch("price");
+
+  useEffect(() => {
+    setValue("quantity", onlyNumbers(quantityValue ? quantityValue : ""));
+    // setValue("price", priceValueMask(priceValue));
+    setValue("price", priceMask(priceValue));
+  }, [quantityValue, priceValue]);
+
   // colocar os tipos
   const handleCreateProductSubmit = async (values: any) => {
     if (edit) {
       startTransition(async () => {
         console.log("funcionou");
         console.log(values);
+        console.log(+values.price.split(" ")[1].replace(",", "."));
+        console.log(values.quantity);
         const newProduct = await EditProductController({
           id: id as string,
           name: values.name,
-          price: +values.price,
+          price: +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", "."),
+          // price: +values.price,
           details: values.details,
           userId: userIdContext,
           quantity: +values.quantity && check ? +values.quantity : 0,
@@ -103,9 +137,19 @@ export function CreateProduct({
       startTransition(async () => {
         console.log("funcionou");
         console.log(values);
+        console.log(values);
+        console.log(
+          +values.price.split(" ")[1].replaceAll(".", "").replaceAll(",", ".")
+        );
+
+        console.log(values.quantity);
         const newProduct = await createProductController({
           name: values.name,
-          price: +values.price,
+          // price: +values.price,
+          price: +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", "."),
           details: values.details,
           userId: userIdContext,
           quantity: +values.quantity ? +values.quantity : 0,
@@ -174,7 +218,8 @@ export function CreateProduct({
             <label className="font-bold">preço:</label>
             <Input
               {...register("price")}
-              type="number"
+              // type="number"
+              type="string"
               placeholder="Ex: R$ 10,00"
             />
           </div>
@@ -184,7 +229,7 @@ export function CreateProduct({
               <label className="font-bold">quntidade:</label>
               <Input
                 {...register("quantity")}
-                type="number"
+                // type="number"
                 placeholder="Ex: 10"
               />
             </div>

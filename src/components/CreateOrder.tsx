@@ -35,6 +35,7 @@ import {
   EditProductQuantityController,
   GetProductController,
 } from "@/app/actions/product-actions";
+import { priceMask } from "@/app/utils/masks";
 
 export type Clients = {
   id: string;
@@ -516,7 +517,8 @@ export function CreateOrder() {
                       </p>
 
                       <span className="flex items-center justify-end   w-[170px] font-bold text-black">
-                        R$ {e.value},00
+                        {/* R$ {e.value},00 */}
+                        {priceMask(`${e.value.toFixed(2)}`)}
                       </span>
                       <Button
                         onClick={(e) => {
@@ -570,9 +572,9 @@ export function CreateOrder() {
             {cliRegis ? (
               <p className="w-[300px] mt-1 small:mt-3 font-bold flex justify-between text-[14px] small:text-[16px]">
                 vai possuir
-                <span
-                  className={`${cliMinusTotal < 0 ? "text-[red]" : ""}`}
-                >{`R$ ${cliMinusTotal},00`}</span>
+                <span className={`${cliMinusTotal < 0 ? "text-[red]" : ""}`}>
+                  {priceMask(`${cliMinusTotal.toFixed(2)}`)}
+                </span>
               </p>
             ) : (
               ""
@@ -581,10 +583,11 @@ export function CreateOrder() {
             <p className="w-[300px] mt-2 small:mt-3 font-bold flex justify-between text-[14px] small:text-[16px]">
               total
               <span>
-                {`R$ ${addProductList.reduce(
-                  (acc, e) => (acc = acc + e.value),
-                  0
-                )},00`}
+                {`${priceMask(
+                  `${addProductList
+                    .reduce((acc, e) => (acc = acc + e.value), 0)
+                    .toFixed(2)}`
+                )}`}
               </span>
             </p>
           </div>

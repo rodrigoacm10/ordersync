@@ -17,6 +17,7 @@ import { ListProductController } from "@/app/actions/product-actions";
 import { createGroup } from "@/app/actions/group-actions";
 import { useToast } from "./ui/use-toast";
 import { editPrice } from "@/app/actions/client-actions";
+import { priceMask } from "@/app/utils/masks";
 
 export function EditPriceClientCont({
   defaultPrice,
@@ -44,7 +45,7 @@ export function EditPriceClientCont({
 
   const formMethods = useForm({
     defaultValues: {
-      price: `${defaultPrice}`,
+      price: priceMask(`${defaultPrice.toFixed(2)}`),
       //   costValue: "0",
       //   profitMargin: "0",
       //   saleValue: "0",
@@ -68,7 +69,11 @@ export function EditPriceClientCont({
 
     const editClient = await editPrice({
       id: idConcluded,
-      price: +values.price,
+      // price: +values.price,
+      price: +values.price
+        .split(" ")[1]
+        .replaceAll(".", "")
+        .replaceAll(",", "."),
     });
 
     // const newGroup = await createGroup({

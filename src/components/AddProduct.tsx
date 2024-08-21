@@ -14,6 +14,18 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ListProductController } from "@/app/actions/product-actions";
+import { priceMask } from "@/app/utils/masks";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import { cn } from "@/lib/utils";
 
 export function AddProduct() {
   interface Product {
@@ -27,6 +39,8 @@ export function AddProduct() {
   const [productList, setProductList] = useState<Product[]>([]);
   const [curProduct, setCurProduct] = useState<Product>();
   const [allPrice, setAllPrice] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [valueProp, setValueProp] = useState("");
 
   const {
     userIdContext,
@@ -120,11 +134,85 @@ export function AddProduct() {
     >
       <form
         onSubmit={handleSubmit(handleAddProductSubmit)}
-        className="z-50    px-7 fixed pt-6 px-1 pb-2 rounded-[5px] opacity-100 bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2   "
+        // px-7 pt-6 px-1 pb-2
+        className="z-50   px-3 pt-3 w500:px-7 w500:pt-6 pb-2 fixed rounded-[5px] opacity-100 bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2   "
       >
-        <h2 className="font-bold text-[20px]">Adicionar produto</h2>
-        <div className="flex items-center gap-2 mt-2">
-          <Select
+        <h2 className="font-bold text-[16px] w500:text-[20px]">
+          Adicionar produto
+        </h2>
+        <div className="flex items-center gap-1 w500:gap-2 mt-2">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-[140px] justify-center"
+              >
+                {/* {value
+                   ? clientsArr.find((framework) => framework.id === value)
+                       ?.name
+                   : "Encontre o cliente"} */}
+                {valueProp
+                  ? productList.find((framework) => framework.id === valueProp)
+                      ?.name
+                  : "Procurar produto"}
+                {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[140px] p-0">
+              <Command className="">
+                <CommandInput placeholder="Procurar produto" />
+                <CommandList>
+                  <CommandEmpty>Nenhum produto encontrado</CommandEmpty>
+                  <CommandGroup>
+                    {productList.map((framework) => (
+                      <CommandItem
+                        className="w-[140px]"
+                        key={framework.id}
+                        value={framework.id}
+                        onSelect={(currentValue: any) => {
+                          // console.log(currentValue);
+                          // const selectCli = productList.find(
+                          //   (cli) => cli.name == currentValue
+                          // );
+                          // console.log(selectCli);
+
+                          console.log(currentValue);
+                          const prod = productList.find(
+                            (el) => el.id == currentValue
+                          );
+
+                          setCurProduct(prod);
+                          setQuantity(1);
+                          setAllPrice(prod?.price as number);
+                          setValue("product", currentValue);
+
+                          setValueProp(
+                            currentValue === valueProp ? "" : currentValue
+                          );
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            valueProp === framework.id
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {framework.name == "" ? "nenhum" : framework.name}
+                        {/* {framework.name} */}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          {/* <Select
             onValueChange={(e) => {
               console.log(e);
               const prod = productList.find((el) => el.id == e);
@@ -159,15 +247,16 @@ export function AddProduct() {
                     </SelectItem>
                   );
                 })}
-                {/* <SelectItem className=" " value="chegada">
+                
+              </SelectGroup>
+            </SelectContent>
+          </Select> */}
+          {/* <SelectItem className=" " value="chegada">
                   nome de produto muito ggrande
                 </SelectItem>
                 <SelectItem className=" " value="recente">
                   recente
-                </SelectItem> */}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+                </SelectItem>   */}
 
           <div className="bg-[#D9D9D9] rounded-xl    items-center flex">
             <Button
@@ -189,9 +278,16 @@ export function AddProduct() {
             {/* <span className="font-bold">{quantity} </span> */}
             <Input
               type="number"
-              className="font-bold bg-transparent border-0 flex items-center w-[80px] text-center  justify-center"
+              className="font-bold bg-transparent border-0 flex items-center w-[70px] w500:w-[80px] text-[14px] w500:text-[16px] text-center  justify-center"
               value={quantity > 0 ? quantity : 1}
-              onChange={(e) => setQuantity(+e.target.value)}
+              onChange={(e) => {
+                setQuantity(+e.target.value);
+
+                if (+e.target.value > 0) {
+                  setAllPrice((curProduct?.price as number) * +e.target.value);
+                }
+                1;
+              }}
             />
             <Button
               onClick={(e) => {
@@ -207,8 +303,8 @@ export function AddProduct() {
             </Button>
           </div>
 
-          <span className="font-bold">
-            {curProduct ? `R$ ${allPrice}` : ""}{" "}
+          <span className="text-[14px] w500:text-[16px] font-bold">
+            {curProduct ? `${priceMask(`${allPrice.toFixed(2)}`)}` : ""}{" "}
           </span>
         </div>
         <div className="  mt-4  flex gap-1 justify-end ">

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useContext } from "react";
 import { SetContext } from "@/contexts/setContext";
+import { priceMask } from "./masks";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -111,7 +112,9 @@ export const Columns = ({ type }: { type: "clients" | "products" }) => {
         accessorKey: "price",
         header: "Valor",
         cell: ({ row }) => {
-          return <div>R$ {row.original.price},00</div>;
+          const user = row.original;
+
+          return <div>{priceMask(`${user.price.toFixed(2)}`)}</div>;
         },
       },
       {
@@ -218,6 +221,11 @@ export const Columns = ({ type }: { type: "clients" | "products" }) => {
       {
         accessorKey: "price",
         header: "Preço",
+        cell: ({ row }) => {
+          const user = row.original;
+
+          return <div>{priceMask(`${user.price.toFixed(2)}`)}</div>;
+        },
       },
       {
         accessorKey: "quantity",

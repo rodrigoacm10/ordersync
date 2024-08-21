@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { listGroups } from "@/app/actions/group-actions";
+import { priceMask } from "@/app/utils/masks";
 
 interface GroupProps {
   id: string;
@@ -70,7 +71,7 @@ export function CreateClient({
   const formMethods = useForm({
     defaultValues: {
       name: name ? name : "",
-      price: price ? `${price}` : "",
+      price: price ? `${price.toFixed(2)}` : "0",
       details: details ? details : "",
 
       //   costValue: "0",
@@ -92,20 +93,35 @@ export function CreateClient({
 
   const groupEditVal = () => {
     // arrumar iss o
-    if (group != groupSelect && groupSelect != ".@") {
+    if (group != groupSelect && groupSelect != ".@" && groupSelect != "add") {
       return groupSelect;
-    } else if (group == null && groupSelect == ".@") {
+    } else if (group == null && (groupSelect == ".@" || groupSelect == "add")) {
       return "";
     }
     // else if (group && groupSelect == ".@") {
     //   return "b";
     // }
-    else if (group && selected == false && groupSelect == ".@") {
+    else if (
+      group &&
+      selected == false &&
+      (groupSelect == ".@" || groupSelect == "add")
+    ) {
       return group;
-    } else if (group && selected == true && groupSelect == ".@") {
+    } else if (
+      group &&
+      selected == true &&
+      (groupSelect == ".@" || groupSelect == "add")
+    ) {
       return "";
     }
   };
+
+  const priceValue = watch("price");
+
+  useEffect(() => {
+    // setValue("price", priceValueMask(priceValue));
+    setValue("price", priceMask(priceValue));
+  }, [priceValue]);
 
   // colocar os tipos
   const handleCreateClientSubmit = async (values: any) => {
@@ -128,7 +144,11 @@ export function CreateClient({
         const newClient = await editClient({
           id: id as string,
           name: values.name,
-          price: +values.price,
+          price: +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", "."),
+          // price: +values.price,
           details: values.details,
           group: groupEditVal() as string,
           // userId: userIdContext,
@@ -152,7 +172,11 @@ export function CreateClient({
         const newClient = await createClient({
           name: values.name,
           group: groupSelect == ".@" ? "" : groupSelect,
-          price: +values.price,
+          price: +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", "."),
+          // price: +values.price,
           details: values.details,
           userId: userIdContext,
         });
@@ -263,8 +287,16 @@ export function CreateClient({
                   </SelectItem>
                   {groups.map((e, i) => {
                     return (
-                      <SelectItem key={i} className="" value={e.name}>
+                      <SelectItem key={i} className="relative " value={e.name}>
                         {e.name}
+                        {/* <Button
+                          className="absolute -left-1 z-60"
+                          onClick={() => {
+                            console.log("cAAAAAAAlickou");
+                          }}
+                        >
+                          a
+                        </Button> */}
                       </SelectItem>
                     );
                   })}
@@ -282,7 +314,7 @@ export function CreateClient({
             <label className="font-bold">valor:</label>
             <Input
               {...register("price")}
-              type="number"
+              type="string"
               placeholder="Ex: R$ 10,00"
             />
           </div>

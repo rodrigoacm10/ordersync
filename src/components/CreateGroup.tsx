@@ -80,7 +80,7 @@ export function CreateGroup() {
     >
       <form
         onSubmit={handleSubmit(handleACreateGroupSubmit)}
-        className="z-50    px-7 fixed pt-6 px-1 pb-2 rounded-[5px] opacity-100 bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2   "
+        className="z-60    px-7 fixed pt-6 px-1 pb-2 rounded-[5px] opacity-100 bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2   "
       >
         <h2 className="font-bold text-[20px]">Criar grupo</h2>
         <div className="flex items-center gap-2 mt-2">
