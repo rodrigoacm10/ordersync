@@ -23,19 +23,26 @@ export const createClient = async ({
   userId,
   group,
 }: CreateCLientProps) => {
-  const newClient = await prisma.client.create({
-    data: {
-      name: name,
-      price: price,
-      details: details,
-      userId: userId,
-      group: group,
-    },
-  });
+  try {
+    const newClient = await prisma.client.create({
+      data: {
+        name: name,
+        price: price,
+        details: details,
+        userId: userId,
+        group: group,
+      },
+    });
 
-  console.log(newClient);
+    console.log(newClient);
 
-  return newClient;
+    return newClient;
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
 };
 
 export const listClients = async ({ id }: { id: string }) => {
@@ -92,17 +99,24 @@ export const editClient = async ({
   details: string;
   group: string;
 }) => {
-  const updateClient = await prisma.client.update({
-    where: {
-      id: id,
-    },
-    data: {
-      name: name,
-      price: price,
-      details: details,
-      group: group,
-    },
-  });
+  try {
+    const updateClient = await prisma.client.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: name,
+        price: price,
+        details: details,
+        group: group,
+      },
+    });
 
-  return updateClient;
+    return updateClient;
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import { useContext, useEffect, useState, useTransition } from "react";
 import { Title } from "./Title";
 import { Button } from "./ui/button";
@@ -14,6 +16,10 @@ import {
 import { useToast } from "./ui/use-toast";
 import { Checkbox } from "./ui/checkbox";
 import { onlyNumbers, priceMask, priceValueMask } from "@/app/utils/masks";
+
+type ErrorResponse = {
+  error: string;
+};
 
 export function CreateProduct({
   edit,
@@ -35,6 +41,7 @@ export function CreateProduct({
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   // control ? true : false
+  const [error, setError] = useState<string | null>(null);
   const [check, setCheck] = useState(control ? true : false);
 
   const {
@@ -104,14 +111,29 @@ export function CreateProduct({
     setValue("price", priceMask(priceValue));
   }, [quantityValue, priceValue]);
 
+  // Type Guard para verificar se o objeto é do tipo ErrorResponse
+  function isErrorResponse(obj: any): obj is ErrorResponse {
+    return "error" in obj;
+  }
+
   // colocar os tipos
   const handleCreateProductSubmit = async (values: any) => {
+    setError(null);
     if (edit) {
       startTransition(async () => {
         console.log("funcionou");
         console.log(values);
         console.log(+values.price.split(" ")[1].replace(",", "."));
         console.log(values.quantity);
+        if (
+          +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", ".") <= 0
+        ) {
+          setError("*preço inválido");
+          return;
+        }
         const newProduct = await EditProductController({
           id: id as string,
           name: values.name,
@@ -125,6 +147,13 @@ export function CreateProduct({
           quantity: +values.quantity && check ? +values.quantity : 0,
           control: check,
         });
+        if (
+          isErrorResponse(newProduct) &&
+          newProduct?.error?.includes("name")
+        ) {
+          setError("*nome já existente");
+          return;
+        }
         console.log(newProduct);
         setCreateProductVisible(!createProductVisible);
         reset();
@@ -143,6 +172,15 @@ export function CreateProduct({
         );
 
         console.log(values.quantity);
+        if (
+          +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", ".") <= 0
+        ) {
+          setError("*preço inválido");
+          return;
+        }
         const newProduct = await createProductController({
           name: values.name,
           // price: +values.price,
@@ -155,6 +193,13 @@ export function CreateProduct({
           quantity: +values.quantity ? +values.quantity : 0,
           control: check,
         });
+        if (
+          isErrorResponse(newProduct) &&
+          newProduct?.error?.includes("name")
+        ) {
+          setError("*nome já existente");
+          return;
+        }
         console.log(newProduct);
         setCreateProductVisible(!createProductVisible);
         reset();
@@ -211,6 +256,11 @@ export function CreateProduct({
               type="string"
               placeholder="Ex: Coxinha de frango"
             />
+            {error?.includes("nome") ? (
+              <p className="mt-1 text-[red] text-[12px]">{error}</p>
+            ) : (
+              ""
+            )}
           </div>
 
           {/* colocar mask */}
@@ -222,6 +272,11 @@ export function CreateProduct({
               type="string"
               placeholder="Ex: R$ 10,00"
             />
+            {error?.includes("preço") ? (
+              <p className="mt-1 text-[red] text-[12px]">{error}</p>
+            ) : (
+              ""
+            )}
           </div>
 
           {check ? (

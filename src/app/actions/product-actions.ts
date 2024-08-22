@@ -75,7 +75,10 @@ export const createProductController = async ({
     });
     return newProduct;
   } catch (error) {
-    return error;
+    return {
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 };
 
@@ -104,7 +107,10 @@ export const EditProductController = async ({
     });
     return editedProduct;
   } catch (error) {
-    return error;
+    return {
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 };
 export const EditProductQuantityController = async ({

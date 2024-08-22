@@ -27,6 +27,10 @@ interface GroupProps {
   userId: string;
 }
 
+type ErrorResponse = {
+  error: string;
+};
+
 export function CreateClient({
   edit,
   id,
@@ -48,6 +52,7 @@ export function CreateClient({
   const [groups, setGroups] = useState<GroupProps[]>([]);
   const [groupSelect, setGroupSelect] = useState(".@");
   const [selected, setSelected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     userIdContext,
@@ -123,8 +128,13 @@ export function CreateClient({
     setValue("price", priceMask(priceValue));
   }, [priceValue]);
 
+  function isErrorResponse(obj: any): obj is ErrorResponse {
+    return "error" in obj;
+  }
+
   // colocar os tipos
   const handleCreateClientSubmit = async (values: any) => {
+    setError(null);
     if (edit) {
       startTransition(async () => {
         console.log("funcionou");
@@ -140,7 +150,15 @@ export function CreateClient({
 
         console.log("group", group);
         console.log("select", groupSelect);
-
+        if (
+          +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", ".") <= 0
+        ) {
+          setError("*preço inválido");
+          return;
+        }
         const newClient = await editClient({
           id: id as string,
           name: values.name,
@@ -153,6 +171,10 @@ export function CreateClient({
           group: groupEditVal() as string,
           // userId: userIdContext,
         });
+        if (isErrorResponse(newClient) && newClient?.error?.includes("name")) {
+          setError("*nome já existente");
+          return;
+        }
         console.log(newClient);
         setCreateClientVisible(!createClientVisible);
         reset();
@@ -168,7 +190,15 @@ export function CreateClient({
       startTransition(async () => {
         console.log("funcionou");
         console.log(values);
-
+        if (
+          +values.price
+            .split(" ")[1]
+            .replaceAll(".", "")
+            .replaceAll(",", ".") <= 0
+        ) {
+          setError("*preço inválido");
+          return;
+        }
         const newClient = await createClient({
           name: values.name,
           group: groupSelect == ".@" ? "" : groupSelect,
@@ -180,6 +210,10 @@ export function CreateClient({
           details: values.details,
           userId: userIdContext,
         });
+        if (isErrorResponse(newClient) && newClient?.error?.includes("name")) {
+          setError("*nome já existente");
+          return;
+        }
         console.log(newClient);
         setCreateClientVisible(!createClientVisible);
         reset();
@@ -228,6 +262,11 @@ export function CreateClient({
               type="string"
               placeholder="Ex: Anderson"
             />
+            {error?.includes("nome") ? (
+              <p className="mt-1 text-[red] text-[12px]">{error}</p>
+            ) : (
+              ""
+            )}
           </div>
 
           <div>
@@ -317,6 +356,11 @@ export function CreateClient({
               type="string"
               placeholder="Ex: R$ 10,00"
             />
+            {error?.includes("preço") ? (
+              <p className="mt-1 text-[red] text-[12px]">{error}</p>
+            ) : (
+              ""
+            )}
           </div>
 
           <div>
